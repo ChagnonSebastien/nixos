@@ -2,9 +2,7 @@
 
 {
   imports = [
-    ./hardware-configuration.nix
-    <home-manager/nixos>
-    ./home.nix
+    ./modules/shell.nix
   ];
 
   boot.loader.efi.canTouchEfiVariables = true;
@@ -30,11 +28,6 @@
   time.timeZone = "America/Montreal";
 
   i18n.defaultLocale = "en_US.UTF-8";
-
-  console = {
-    font = "Lat2-Terminus16";
-    useXkbConfig = true;
-  };
 
   fonts.enableDefaultPackages = true;
   fonts.packages = with pkgs; [
@@ -118,44 +111,23 @@
   };
   users.defaultUserShell = pkgs.zsh;
 
+  home-manager.useUserPackages = true;
+  home-manager.useGlobalPkgs = true;
+
+  home-manager.users.seb = import ./home/home.nix;
+
   environment.systemPackages = with pkgs; [
     kdePackages.dolphin
     kdePackages.breeze-icons
     spacedrive
     seatd
-    kitty
-    pciutils
-    wget
-    tree
     pavucontrol
     swaynotificationcenter # Notification daemon 
     playerctl
-    ntfs3g
     cudatoolkit
   ];
 
   programs.nix-ld.enable = true;
-
-  programs = {
-    zsh = {
-      enable = true;
-      ohMyZsh = {
-        enable = true;
-        theme = "robbyrussell";
-        plugins = [ "git" "fzf" ]; 
-      };
-      histSize = 5000;
-      autosuggestions.enable = true;
-      syntaxHighlighting.enable = true;
-    };
-    git.enable = true;
-    vim.enable = true;
-    neovim.enable = true;
-    fzf = {
-      fuzzyCompletion = true;
-      keybindings = true;
-    };
-  };
 
   programs.hyprland = {
     enable = true;
@@ -181,10 +153,14 @@
     dates = "weekly";
   };
 
+  nix = {
+    settings.experimental-features = [ "nix-command" "flakes" ];
+  };
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
-  system.copySystemConfiguration = true;
+  #system.copySystemConfiguration = true;
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
