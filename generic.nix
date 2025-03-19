@@ -1,10 +1,6 @@
 { pkgs, ... }:
 
 {
-  imports = [
-    ./modules/shell.nix
-  ];
-
   nix = {
     gc = {
       automatic = true;

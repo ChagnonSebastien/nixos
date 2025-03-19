@@ -1,7 +1,6 @@
-{ pkgs, ... }:
-
 {
   imports = [
+    ./generic.nix
     ./modules/shell.nix
     ./modules/desktop.nix
   ];
@@ -17,25 +16,6 @@
       default = 0;
     };
   };
-
-  nix = {
-    gc = {
-      automatic = true;
-      dates = "weekly";
-    };
-
-    settings.experimental-features = [ "nix-command" "flakes" ];
-  };
-
-  nixpkgs.config = {
-    allowUnfree = true;
-    permittedInsecurePackages = [];
-  };
-
-  programs.nix-ld.enable = true;
-
-  time.timeZone = "America/Montreal";
-  i18n.defaultLocale = "en_US.UTF-8";
 
   networking = {
     hostName = "DesktopL";
@@ -62,7 +42,6 @@
       extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" ];
       initialPassword = "change-me";
     };
-    defaultUserShell = pkgs.zsh;
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,

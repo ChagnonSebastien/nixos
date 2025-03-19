@@ -60,7 +60,10 @@
                 sharedModules = [
                   nixvim.homeManagerModules.nixvim 
                 ];
-                users.seb = ./home/wsl.nix;
+                users.seb = {
+                  imports = [ ./home/shell.nix ];
+                  home.stateVersion = "24.05";
+                };
               };
             }
           ];
