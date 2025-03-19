@@ -4,12 +4,16 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixvim = {
+      url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager }:
+  outputs = { self, nixpkgs, home-manager, nixvim }:
     let
       system = "x86_64-linux";
     in {
@@ -19,7 +23,18 @@
           modules = [
             ./configuration.nix
             ./hardware-configuration.nix
+
             home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                sharedModules = [
+                  nixvim.homeManagerModules.nixvim 
+                ];
+                users.seb = ./home/home.nix;
+              };
+            }
           ];
         };
       };
@@ -29,8 +44,9 @@
           pkgs = nixpkgs.packages.${system};
           modules = [
             ./home.nix
+            nixvim.homeManagerModules.nixvim
           ];
-	};
+        };
       };
     };
 }

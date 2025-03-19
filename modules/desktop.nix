@@ -1,6 +1,8 @@
 { config, lib, pkgs, ... }:
 
 {
+  boot.kernelParams = [ "nvidia-drm.fbdev=1"];
+
   fonts.enableDefaultPackages = true;
   fonts.packages = with pkgs; [
     ubuntu_font_family
