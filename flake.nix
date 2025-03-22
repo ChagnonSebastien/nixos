@@ -38,11 +38,35 @@
             }
           ];
         };
+        Homelab = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./homelab.nix
+            ./homelab-hardware-configuration.nix          
+
+            ./generic.nix
+            ./modules/shell.nix
+
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                sharedModules = [
+                  nixvim.homeManagerModules.nixvim 
+                ];
+                users.seb = {
+                  imports = [ ./home/shell.nix ];
+                  home.stateVersion = "24.05";
+                };
+              };
+            }
+          ];
+        };
         WSL = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
             nixos-wsl.nixosModules.default
-
             {
               wsl.enable = true;
               wsl.defaultUser = "seb";
