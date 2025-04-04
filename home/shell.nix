@@ -147,14 +147,41 @@
         enable = true;
         delay = 100;
       };
+      telescope = {
+        enable = true;
+        autoLoad = true;
+
+      };
     };
 
     opts = {
+      # Appearance
       number = true;
       relativenumber = true;
+      termguicolors = true;
+      colorcolumn = "120";
+      signcolumn = "yes";
+      cmdheight = 1;
+      scrolloff = 10;
+
+      # Tab / Indentation
       shiftwidth = 2;
       tabstop = 2;
+      softtabstop = 2;
       expandtab = true;
+      smartindent = true;
+      wrap = false;
+
+      # Behavior
+      hidden = true;
+      errorbells = false;
+      swapfile = false;
+      backup = false;
+      backspace = "indent,eol,start";
+      splitright = true;
+      splitbelow = true;
+      autochdir = false;
+
       list = true;
     };
   };
