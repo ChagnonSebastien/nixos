@@ -6,6 +6,21 @@
     useXkbConfig = true;
   };
 
+  fonts.enableDefaultPackages = true;
+  fonts.packages = with pkgs; [
+    ubuntu_font_family
+    liberation_ttf
+    vazir-fonts
+    font-awesome
+  ];
+  fonts.fontconfig = {
+    defaultFonts = {
+      serif = [  "Liberation Serif" "Vazirmatn" ];
+      sansSerif = [ "Ubuntu" "Vazirmatn" ];
+      monospace = [ "FiraCode" ];
+    };
+  };
+
   environment.systemPackages = with pkgs; [
     kitty
     pciutils

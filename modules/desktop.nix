@@ -3,26 +3,6 @@
 {
   boot.kernelParams = [ "nvidia-drm.fbdev=1"];
 
-  fonts.enableDefaultPackages = true;
-  fonts.packages = with pkgs; [
-    ubuntu_font_family
-    liberation_ttf
-    vazir-fonts
-    font-awesome
-    nerd-fonts.fira-code
-  ];
-  fonts.fontconfig = {
-    defaultFonts = {
-      serif = [  "Liberation Serif" "Vazirmatn" ];
-      sansSerif = [ "Ubuntu" "Vazirmatn" ];
-      monospace = [ "FiraCode" ];
-    };
-  };
-
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [
-  ];
-
   hardware.graphics.enable = true;
   hardware.nvidia-container-toolkit.enable = true;
   services.xserver.videoDrivers = ["nvidia"];
