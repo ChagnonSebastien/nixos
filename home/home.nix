@@ -42,6 +42,8 @@
     winetricks
     prismlauncher
     obs-studio
+    obsidian
+    owncloud-client
   ];
 
   xdg.mimeApps = {
