@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   console = {
@@ -27,6 +27,8 @@
     wget
     tree
     ntfs3g
+    unzip
+    jq
   ];
 
   programs = {

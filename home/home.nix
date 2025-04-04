@@ -8,8 +8,8 @@
   ];
 
   home.packages = with pkgs; [
-    brave
     librewolf
+
     qview
     vesktop
     rofi-wayland
@@ -22,6 +22,7 @@
     grim # Screenshot from wayland compositor
     slurp # Screenshot zone selection 
     wl-clipboard # Clipboard CLI
+    cliphist # Clipboard history
     (writeShellScriptBin "jellyfin" ''
       export QT_QPA_PLATFORM="xcb"
       exec ${pkgs.jellyfin-media-player}/bin/jellyfinmediaplayer "$@"
@@ -30,7 +31,6 @@
     wireguard-tools
     caprine
     element-desktop
-    libreoffice-qt6-still
     qbittorrent-enhanced
     beekeeper-studio
     (writeShellScriptBin "beekeeper" ''
@@ -43,7 +43,8 @@
     prismlauncher
     obs-studio
     obsidian
-    owncloud-client
+    #libreoffice-qt6-still
+    onlyoffice-desktopeditors
   ];
 
   xdg.mimeApps = {
@@ -55,8 +56,30 @@
       "x-scheme-handler/https" = "librewolf.desktop";
       "x-scheme-handler/about" = "librewolf.desktop";
       "x-scheme-handler/unknown" = "librewolf.desktop";
+
+      "application/pdf" = "onlyoffice-desktopeditors.desktop";
+
+      "image/apng" = "qview.desktop";
+      "image/avif" = "qview.desktop";
+      "image/bmp" = "qview.desktop";
+      "image/gif" = "qview.desktop";
+      "image/vnd.microsoft.icon" = "qview.desktop";
+      "image/jpeg" = "qview.desktop";
+      "image/png" = "qview.desktop";
+      "image/svg+xml" = "qview.desktop";
+      "image/tiff" = "qview.desktop";
+      "image/webp" = "qview.desktop";
+
+      "video/x-msvideo" = "mpv.desktop";
+      "video/mp4" = "mpv.desktop";
+      "video/mpeg" = "mpv.desktop";
+      "video/ogg" = "mpv.desktop";
+      "video/mp2t" = "mpv.desktop";
+      "video/webm" = "mpv.desktop";
     };
   };
+
+  services.owncloud-client.enable = true;
 
   programs.kitty = {
     enable = true;

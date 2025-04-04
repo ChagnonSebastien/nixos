@@ -5,15 +5,15 @@
   };
 
   home.packages = with pkgs; [
-    zsh
     bat
-    unzip
     (btop.override { cudaSupport = true; })
-    jq
-    zoxide
     tlrc # tldr
-    cliphist # Clipboard history
     dust
+
+    superfile
+    (writeShellScriptBin "spf" ''
+      exec ${pkgs.superfile}/bin/superfile "$@"
+    '')
   ];
 
   home = {
@@ -142,6 +142,7 @@
         };
       };
       lualine.enable = true;
+      luasnip.enable = true;
       lsp-lines.enable = true;
       illuminate = {
         enable = true;
@@ -152,6 +153,7 @@
         autoLoad = true;
 
       };
+      web-devicons.enable = true;
     };
 
     opts = {
@@ -239,7 +241,7 @@
 
   programs.zoxide = {
     enable = true;
-    options = [ "--cmd cd" ];
+    options = [ "--cmd j" ];
     enableZshIntegration = true;
   };
 

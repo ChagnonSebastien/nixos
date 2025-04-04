@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   boot.kernelParams = [ "nvidia-drm.fbdev=1"];
@@ -40,6 +40,9 @@
   services.xserver.xkb.layout = "ca";
   services.xserver.xkb.variant = "fr";
 
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.greetd.enableGnomeKeyring = true;
+
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -51,8 +54,6 @@
   services.seatd.enable = true;
 
   environment.systemPackages = with pkgs; [
-    kdePackages.dolphin
-    kdePackages.breeze-icons
     spacedrive
     seatd
     pavucontrol

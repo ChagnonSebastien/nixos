@@ -13,6 +13,7 @@
         "waybar"
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "wl-paste --type image --watch cliphist store" # Stores only image data
+        "gnome-keyring-daemon --start --components=secrets"
       ];
 
       env = [
@@ -89,7 +90,7 @@
       };
 
       "$terminal" = "kitty";
-      "$fileManager" = "dolphin";
+      "$fileManager" = "superfile";
       "$menu" = "rofi -show run";
       "$launcher" = "rofi -show drun";
       "$mainMod" = "SUPER";
@@ -98,7 +99,7 @@
         "$mainMod, N, exec, $terminal"
         "$mainMod, delete, killactive,"
         "$mainMod, L, exit,"
-        "$mainMod, E, exec, $fileManager"
+        "$mainMod, E, exec, $terminal $fileManager"
         "$mainMod, F, togglefloating,"
         "$mainMod, P, pseudo,"
         "$mainMod, J, togglesplit,"
