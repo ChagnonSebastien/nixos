@@ -39,7 +39,7 @@
   users = {
     users.seb = {
       isNormalUser = true;
-      extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" ];
+      extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" "vboxusers" ];
       initialPassword = "change-me";
     };
   };

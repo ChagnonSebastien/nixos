@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  boot.kernelParams = [ "nvidia-drm.fbdev=1"];
+  boot.kernelParams = [ "nvidia-drm.fbdev=1" "kvm.enable_virt_at_load=0"];
 
   hardware.graphics.enable = true;
   hardware.nvidia-container-toolkit.enable = true;
@@ -11,7 +11,7 @@
     powerManagement.enable = true;
     forceFullCompositionPipeline = true;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
     open = false;
   };
 
@@ -74,7 +74,13 @@
     localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
   };
 
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "seb" ];
+
+  environment.sessionVariables = {
+    #ELECTRON_OZONE_PLATFORM_HINT = "wayland";
+    #NIXOS_OZONE_WL = "1";
+  };
   environment.variables = {
     XDG_SESSION_TYPE = "wayland";
     XDG_RUNTIME_DIR = "/run/user/$(id -u)";
