@@ -92,7 +92,7 @@
                   nixvim.homeManagerModules.nixvim 
                 ];
                 users.seb = {
-                  imports = [ ./home/shell.nix ];
+                  imports = [ ./home/wsl.nix ];
                   home.stateVersion = "24.05";
                 };
               };
