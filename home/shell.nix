@@ -121,11 +121,6 @@
           clangd = {
             enable = true;
             autostart = true;
-            rootDir = ''
-              function(fname)
-                return require("lspconfig.util").root_pattern("compile_commands.json", ".git")(fname)
-              end
-            '';
           };
           nil_ls = {
             enable = true;
@@ -211,7 +206,7 @@
         nixpkg "https://search.nixos.org/packages?channel=unstable&from=0&size=50&sort=relevance&type=packages&query="
       )
     '';
-    initExtra = ''
+    initContent = ''
       precmd() { print "" }
     '';
     antidote = {

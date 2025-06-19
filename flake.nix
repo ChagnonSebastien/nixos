@@ -9,13 +9,17 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    home-manager-unstable = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     nixvim = {
       url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, nixvim }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim }:
     let
       system = "x86_64-linux";
     in {
@@ -26,7 +30,7 @@
             ./configuration.nix
             ./hardware-configuration.nix
 
-            home-manager.nixosModules.home-manager
+            home-manager-unstable.nixosModules.home-manager
             {
               home-manager = {
                 useGlobalPkgs = true;

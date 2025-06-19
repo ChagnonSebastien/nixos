@@ -17,6 +17,10 @@
     };
   };
 
+  nixpkgs.config.permittedInsecurePackages = [
+    "beekeeper-studio-5.2.12"
+  ];
+
   networking = {
     hostName = "DesktopL";
     networkmanager.enable = true;
@@ -29,7 +33,7 @@
   };
 
   virtualisation.docker = {
-    enable = true;
+    enable = false;
     rootless = {
       enable = true;
       setSocketVariable = true;
