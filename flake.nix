@@ -45,23 +45,21 @@
         };
         Homelab = nixpkgs.lib.nixosSystem {
           inherit system;
+
           modules = [
             ./homelab.nix
-            ./homelab-hardware-configuration.nix          
-
+            ./homelab-hardware-configuration.nix
             ./generic.nix
             ./modules/shell.nix
 
             home-manager.nixosModules.home-manager
             {
               home-manager = {
-                useGlobalPkgs = true;
+                useGlobalPkgs   = true;
                 useUserPackages = true;
-                sharedModules = [
-                  nixvim.homeManagerModules.nixvim 
-                ];
+                sharedModules   = [ nixvim.homeManagerModules.nixvim ];
                 users.seb = {
-                  imports = [ ./home/shell.nix ];
+                  imports          = [ ./home/shell.nix ];
                   home.stateVersion = "24.05";
                 };
               };
