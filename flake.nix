@@ -15,11 +15,15 @@
     };
     nixvim = {
       url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixvim-unstable = {
+      url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable }:
     let
       system = "x86_64-linux";
     in {
@@ -36,7 +40,7 @@
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 sharedModules = [
-                  nixvim.homeManagerModules.nixvim 
+                  nixvim-unstable.homeManagerModules.nixvim 
                 ];
                 users.seb = ./home/home.nix;
               };
