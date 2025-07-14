@@ -188,9 +188,14 @@
     userName = "Sebastien Chagnon";
     userEmail = "sebastien.chagnon@qohash.com";
     extraConfig = {
+      core.autocrlf = "input";
       push.default = "current";
+      push.autoSetupRemote = true;
+      pull.rebase = true;
+      alias.lg1 = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all";
+      alias.lg2 = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'";
+      alias.lg = "lg1";
     };
-
   };
 
   programs.zsh = {
