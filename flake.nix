@@ -40,7 +40,7 @@
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 sharedModules = [
-                  nixvim-unstable.homeManagerModules.nixvim 
+                  nixvim-unstable.homeModules.nixvim 
                 ];
                 users.seb = ./home/home.nix;
               };
@@ -61,7 +61,7 @@
               home-manager = {
                 useGlobalPkgs   = true;
                 useUserPackages = true;
-                sharedModules   = [ nixvim.homeManagerModules.nixvim ];
+                sharedModules   = [ nixvim.homeModules.nixvim ];
                 users.seb = {
                   imports          = [ ./home/shell.nix ];
                   home.stateVersion = "24.05";
@@ -83,13 +83,13 @@
             ./generic.nix
             ./modules/shell.nix
 
-            home-manager.nixosModules.home-manager
+            home-manager-unstable.nixosModules.home-manager
             {
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 sharedModules = [
-                  nixvim.homeManagerModules.nixvim 
+                  nixvim-unstable.homeModules.nixvim 
                 ];
                 users.seb = {
                   imports = [ ./home/wsl.nix ];
@@ -106,7 +106,7 @@
           pkgs = nixpkgs-unstable.packages.${system};
           modules = [
             ./home.nix
-            nixvim.homeManagerModules.nixvim
+            nixvim.homeModules.nixvim
           ];
         };
       };
