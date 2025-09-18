@@ -14,6 +14,7 @@
         "wl-paste --type text --watch cliphist store" # Stores only text data
         "wl-paste --type image --watch cliphist store" # Stores only image data
         "gnome-keyring-daemon --start --components=secrets"
+        "fcitx5 -d"
       ];
 
       env = [

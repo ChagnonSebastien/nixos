@@ -40,6 +40,16 @@
   services.xserver.xkb.layout = "ca";
   services.xserver.xkb.variant = "fr";
 
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5.addons = with pkgs; [
+      fcitx5-gtk              # GTK immodule
+      fcitx5-chinese-addons   # Pinyin/Shuangpin, punctuation, etc.
+      fcitx5-rime             # Rime (Pinyin/Bopomofo/Wubi via schemas)
+    ];
+  };
+
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.greetd.enableGnomeKeyring = true;
 

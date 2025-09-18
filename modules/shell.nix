@@ -12,6 +12,8 @@
     liberation_ttf
     vazir-fonts
     font-awesome
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
   ];
   fonts.fontconfig = {
     defaultFonts = {

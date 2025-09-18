@@ -12,7 +12,7 @@
 
     qview
     vesktop
-    rofi-wayland
+    rofi
     youtube-music
     mpv
     bitwarden
@@ -45,6 +45,10 @@
     obsidian
     #libreoffice-qt6-still
     onlyoffice-desktopeditors
+    #chromium
+    #(writeShellScriptBin "google-chrome" ''
+    #  exec ${pkgs.chromium}/bin/chromium "$@"
+    #'')
   ];
 
   xdg.mimeApps = {

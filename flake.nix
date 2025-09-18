@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -33,6 +33,13 @@
           modules = [
             ./configuration.nix
             ./hardware-configuration.nix
+
+            ({...}: {
+              nixpkgs.config.permittedInsecurePackages = [
+                "beekeeper-studio-5.3.4"
+                "qtwebengine-5.15.19"
+              ];
+            })
 
             home-manager-unstable.nixosModules.home-manager
             {
