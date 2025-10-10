@@ -22,6 +22,7 @@ in
     go
     k9s
     azure-cli
+    icu
   ];
 
   # The state version is required and should stay at the version you
