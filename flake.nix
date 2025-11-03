@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.05";
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -77,7 +77,7 @@
             }
           ];
         };
-        WSL = nixpkgs-unstable.lib.nixosSystem {
+        WSL = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
             nixos-wsl.nixosModules.default
@@ -90,13 +90,13 @@
             ./generic.nix
             ./modules/shell.nix
 
-            home-manager-unstable.nixosModules.home-manager
+            home-manager.nixosModules.home-manager
             {
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 sharedModules = [
-                  nixvim-unstable.homeModules.nixvim 
+                  nixvim.homeModules.nixvim 
                 ];
                 users.seb = {
                   imports = [ ./home/wsl.nix ];
