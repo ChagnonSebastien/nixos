@@ -140,9 +140,7 @@
       lsp-lines.enable = true;
       illuminate = {
         enable = true;
-        settings = {
-          delay = 100;
-        };
+        delay = 100;
       };
       telescope = {
         enable = true;
@@ -186,11 +184,9 @@
 
   programs.git = {
     enable = true;
-    settings = {
-      user = {
-        name = "Sebastien Chagnon";
-        email = "sebastien.chagnon@qohash.com";
-      };
+    userName = "Sebastien Chagnon";
+    userEmail = "sebastien.chagnon@qohash.com";
+    extraConfig = {
       core.autocrlf = "input";
       push.default = "current";
       push.autoSetupRemote = true;
