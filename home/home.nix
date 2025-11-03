@@ -15,7 +15,7 @@
     rofi
     youtube-music
     mpv
-    bitwarden
+    bitwarden-desktop
     bitwarden-cli
     jellyfin-media-player
     satty # Screenshoot editor

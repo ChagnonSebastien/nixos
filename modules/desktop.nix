@@ -45,7 +45,7 @@
     type = "fcitx5";
     fcitx5.addons = with pkgs; [
       fcitx5-gtk              # GTK immodule
-      fcitx5-chinese-addons   # Pinyin/Shuangpin, punctuation, etc.
+      qt6Packages.fcitx5-chinese-addons #fcitx5-chinese-addons   # Pinyin/Shuangpin, punctuation, etc.
       fcitx5-rime             # Rime (Pinyin/Bopomofo/Wubi via schemas)
     ];
   };

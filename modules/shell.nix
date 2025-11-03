@@ -8,7 +8,8 @@
 
   fonts.enableDefaultPackages = true;
   fonts.packages = with pkgs; [
-    ubuntu_font_family
+    ubuntu-classic
+    #ubuntu_font_family
     liberation_ttf
     vazir-fonts
     font-awesome
