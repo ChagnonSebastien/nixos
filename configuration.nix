@@ -17,11 +17,6 @@
     };
   };
 
-  #nixpkgs.config.permittedInsecurePackages = [
-  #  "beekeeper-studio-5.3.4"
-  #  "qtwebengine-5.15.19"
-  #];
-
   networking = {
     hostName = "DesktopL";
     networkmanager.enable = true;

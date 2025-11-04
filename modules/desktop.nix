@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  boot.kernelParams = [ "nvidia-drm.fbdev=1" "kvm.enable_virt_at_load=0"];
+  boot.kernelParams = [ "kvm.enable_virt_at_load=0"]; # nvidia-drm.fbdev=1
 
   hardware.graphics.enable = true;
   hardware.nvidia-container-toolkit.enable = true;
@@ -52,6 +52,7 @@
 
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.greetd.enableGnomeKeyring = true;
+  security.pam.services.hyprlock = { };
 
   security.rtkit.enable = true;
   services.pipewire = {
@@ -68,6 +69,7 @@
     seatd
     pavucontrol
     swaynotificationcenter # Notification daemon 
+    sway-audio-idle-inhibit
     playerctl
     cudatoolkit
   ];

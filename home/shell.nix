@@ -33,7 +33,7 @@
         enable = true;
         autoEnableSources = true;
         settings = {
-          experimental = { ghost_text = true; };
+          experimental = { ghost_text = false; };
           snippet.expand = ''
             function(args)
               require('luasnip').lsp_expand(args.body)

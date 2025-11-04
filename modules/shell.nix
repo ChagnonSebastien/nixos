@@ -9,12 +9,12 @@
   fonts.enableDefaultPackages = true;
   fonts.packages = with pkgs; [
     ubuntu-classic
-    #ubuntu_font_family
     liberation_ttf
     vazir-fonts
     font-awesome
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif
+    nerd-fonts.fira-code
   ];
   fonts.fontconfig = {
     defaultFonts = {

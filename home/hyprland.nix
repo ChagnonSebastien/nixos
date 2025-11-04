@@ -15,6 +15,7 @@
         "wl-paste --type image --watch cliphist store" # Stores only image data
         "gnome-keyring-daemon --start --components=secrets"
         "fcitx5 -d"
+        "sway-audio-idle-inhibit"
       ];
 
       env = [
@@ -99,7 +100,7 @@
       bind = [
         "$mainMod, N, exec, $terminal"
         "$mainMod, delete, killactive,"
-        "$mainMod, L, exit,"
+        "$mainMod, L, exec, pidof hyprlock || hyprlock -q"
         "$mainMod, E, exec, $terminal $fileManager"
         "$mainMod, F, togglefloating,"
         "$mainMod, P, pseudo,"
@@ -157,4 +158,155 @@
     }; 
   };
 
+  programs.hyprlock = {
+    enable = true;
+    settings = {
+      general = {
+        hide_cursor = false;
+        ignore_empty_input = true;
+        grace = 1;
+      };
+
+      background = [
+        {
+          monitor = "";
+          blur_passes = 2;
+          contrast = 0.8916;
+          brightness = 0.8172;
+          vibrancy = 0.1696;
+          vibrancy_darkness = 0.0;
+        }
+      ];
+
+      label = [
+        {
+          monitor = "";
+          text = "cmd[update:1000] echo -e \"$(date +\"%A\")\"";
+          color = "rgba(216, 222, 233, 0.70)";
+          font_size = 90;
+          font_family = "SF Pro Display Bold";
+          position = "0, 350";
+          halign = "center";
+          valign = "center";
+        }
+        {
+          monitor = "";
+          text = "cmd[update:1000] echo -e \"$(date +\"%d %B\")\"";
+          color = "rgba(216, 222, 233, 0.70)";
+          font_size = 40;
+          font_family = "SF Pro Display Bold";
+          position = "0, 250";
+          halign = "center";
+          valign = "center";
+        }
+        {
+          monitor = "";
+          text = "cmd[update:1000] echo -e \"<span>$(date +\"- %I:%M -\")</span>\"";
+          color = "rgba(216, 222, 233, 0.70)";
+          font_size = 20;
+          font_family = "SF Pro Display Bold";
+          position = "0, 190";
+          halign = "center";
+          valign = "center";
+        }
+        {
+          monitor = "";
+          text = "    $USER";
+          color = "rgba(216, 222, 233, 0.70)";
+          font_size = 18;
+          font_family = "SF Pro Display Bold";
+          position = "0, -130";
+          halign = "center";
+          valign = "center";
+        }
+        {
+          monitor = "";
+          text = " 󰜉 ";
+          color = "rgba(255, 255, 255, 0.6)";
+          font_size = 50;
+          onclick = "reboot now";
+          position = "0, 100";
+          halign = "center";
+          valign = "bottom";
+          font_family = "FiraCode Nerd Font";
+        }
+        {
+          monitor = "";
+          text = " 󰐥 ";
+          color = "rgba(255, 255, 255, 0.6)";
+          font_size = 50;
+          onclick = "shutdown now";
+          position = "820, 100";
+          halign = "left"; 
+          valign = "bottom";
+          font_family = "FiraCode Nerd Font";
+        }
+        {
+          monitor = "";
+          text = " 󰤄 ";
+          color = "rgba(255, 255, 255, 0.6)";
+          font_size = 50;
+          onclick = "systemctl suspend";
+          position = "-820, 100";
+          halign = "right";
+          valign = "bottom";
+          font_family = "FiraCode Nerd Font";
+        }
+      ];
+
+      input-field = [
+        {
+          monitor = "";
+          size = "300, 60";
+          outline_thickness = 2;
+          dots_size = 0.2;
+          dots_spacing = 0.2;
+          outer_color = "rgba(255, 255, 255, 0)";
+          inner_color = "rgba(255, 255, 255, 0.1)";
+          font_color = "rgb(200, 200, 200)";
+          halign = "center";
+          valign = "center";
+          font_family = "SF Pro Display Bold";
+          position = "0, -210";
+          dots_center = true;
+          fade_on_empty = false;
+          hide_input = false;
+          placeholder_text = "<i><span foreground=\"##ffffff99\">🔒 Enter Pass</span></i>";
+        }
+      ];
+    };
+  };
+
+  services.hypridle = {
+    enable = true;
+    settings = {
+      general = {
+        lock_cmd = "pidof hyprlock || hyprlock -q";
+        before_sleep_cmd = "loginctl lock-session";
+        after_sleep_cmd  = "hyprctl dispatch dpms on";
+        unlock_cmd       = "hyprctl dispatch dpms on";
+
+        ignore_dbus_inhibit = false;
+        ignore_systemd_inhibit = false;
+      };
+
+      listener = [
+        {
+          timeout = 300;
+          on-timeout = "pidof hyprlock || hyprlock";
+        }
+        {
+          timeout = 600;
+          on-timeout = "hyprctl dispatch dpms off";
+          on-resume  = "hyprctl dispatch dpms on";
+        }
+        {
+          timeout = 1800;
+          on-timeout = "systemctl suspend";
+        }
+      ];
+    };
+  };
+
 }
+
