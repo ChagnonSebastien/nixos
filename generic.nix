@@ -12,7 +12,10 @@
 
   nixpkgs.config = {
     allowUnfree = true;
-    permittedInsecurePackages = [];
+    permittedInsecurePackages = [
+      "beekeeper-studio-5.3.4"
+      "gradle-7.6.6"
+    ];
   };
 
   programs.nix-ld.enable = true;
