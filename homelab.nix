@@ -11,6 +11,10 @@ let
   kubeMasterAPIServerPort = 6443;
 in
 {
+  imports = [
+    ./modules/nvidia-gpu.nix
+  ];
+
   # Use the systemd-boot EFI boot loader.
   boot.loader = {
     efi.canTouchEfiVariables = true;

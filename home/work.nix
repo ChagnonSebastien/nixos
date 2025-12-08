@@ -21,6 +21,7 @@
       exec ${pkgs.beekeeper-studio}/bin/beekeeper-studio "$@"
     '')
     jetbrains.idea-ultimate
+    obs-studio
 
     awscli2
     kubectl
@@ -28,11 +29,20 @@
     openssl
     kubernetes-helm
     go
+    gcc
     k9s
     azure-cli
     corretto21
     nodejs
-  ];
+
+    pre-commit
+    golangci-lint
+    gofumpt
+    gotools
+    gnumake
+    postgresql
+    protobuf
+];
 
   xdg.mimeApps = {
     enable = true;
