@@ -13,7 +13,10 @@
   ];
 
   home = {
-    sessionPath = [ "$HOME/.local/bin" ];
+    sessionPath = [
+      "$HOME/.local/bin"
+      "$HOME/go/bin"
+    ];
     sessionVariables = {
       SUDO_EDITOR = "nvim";
       SHELL = "${pkgs.zsh}/bin/zsh";

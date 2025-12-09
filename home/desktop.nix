@@ -1,10 +1,8 @@
 { pkgs, ...}: {
 
   imports = [
-    ./shell.nix
-    ./hyprland.nix
-    ./hyprpaper.nix
-    ./waybar.nix
+    ./modules/shell.nix
+    ./desktop-environment/hyprland.nix
   ];
 
   home.packages = with pkgs; [
@@ -12,17 +10,11 @@
 
     qview
     vesktop
-    rofi
     youtube-music
     mpv
     bitwarden-desktop
     bitwarden-cli
     jellyfin-media-player
-    satty # Screenshoot editor
-    grim # Screenshot from wayland compositor
-    slurp # Screenshot zone selection 
-    wl-clipboard # Clipboard CLI
-    cliphist # Clipboard history
     (writeShellScriptBin "jellyfin" ''
       export QT_QPA_PLATFORM="xcb"
       exec ${pkgs.jellyfin-media-player}/bin/jellyfinmediaplayer "$@"
@@ -84,21 +76,6 @@
   };
 
   services.owncloud-client.enable = true;
-
-  programs.kitty = {
-    enable = true;
-    settings = {
-      enable_audio_bell = false;
-    };
-    extraConfig = ''
-      include ${pkgs.fetchFromGitHub {
-        owner = "catppuccin";
-        repo = "kitty";
-        rev = "main";
-        sha256 = "1sfjwvn6xwc882mzv9nhb8wsw3q4kapypq7gh1dkq3jqcjc717b3";
-      }}/themes/mocha.conf
-    '';
-  };
 
   # The state version is required and should stay at the version you
   # originally installed.

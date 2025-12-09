@@ -9,73 +9,30 @@
     ./generic.nix
     ./modules/shell.nix
     ./modules/nvidia-gpu.nix
+    ./modules/docker-rootless.nix
+    ./desktop-environment/shared.nix
+    ./desktop-environment/plasma.nix
   ];
 
-
-  # Bootloader.
-  boot.loader = {
-    efi.canTouchEfiVariables = true;
-    timeout = 10;
-    grub = {
-      enable = true;
-      device = "nodev";
-      efiSupport = true;
-      useOSProber = true;
-      default = 0;
-    };
-  };
+  boot.extraModulePackages = with config.boot.kernelPackages; [
+    v4l2loopback.out
+  ];
+  boot.kernelModules = [
+    "v4l2loopback"
+    "snd-aloop"
+  ];
+  boot.extraModprobeConfig = ''
+    # exclusive_caps: Skype, Zoom, Teams etc. will only show device when actually streaming
+    # card_label: Name of virtual camera, how it'll show up in Skype, Zoom, Teams
+    # https://github.com/umlaeute/v4l2loopback
+    options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+  '';
 
   networking.hostName = "Work"; # Define your hostname.
   networking.networkmanager.enable = true;
 
   environment.sessionVariables = {
-    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-    NIXOS_OZONE_WL = "1";
     GOPRIVATE = "gitlab.com/qohash/*";
-
-  };
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_CA.UTF-8";
-    LC_IDENTIFICATION = "en_CA.UTF-8";
-    LC_MEASUREMENT = "en_CA.UTF-8";
-    LC_MONETARY = "en_CA.UTF-8";
-    LC_NAME = "en_CA.UTF-8";
-    LC_NUMERIC = "en_CA.UTF-8";
-    LC_PAPER = "en_CA.UTF-8";
-    LC_TELEPHONE = "en_CA.UTF-8";
-    LC_TIME = "en_CA.UTF-8";
-  };
-
-  # Enable the X11 windowing system.
-  # You can disable this if you're only using the Wayland session.
-  services.xserver.enable = true;
-
-
-  # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.openssh.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-  virtualisation.docker = {
-    enable = false;
-    rootless = {
-      enable = true;
-      setSocketVariable = true;
-    };
   };
 
   users.users.seb = {

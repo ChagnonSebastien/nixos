@@ -31,8 +31,8 @@
         DesktopL = nixpkgs-unstable.lib.nixosSystem {
           inherit system;
           modules = [
-            ./configuration.nix
-            ./hardware-configuration.nix
+            ./desktop.nix
+            ./hardware-configuration/desktop.nix
 
             ({...}: {
               nixpkgs.config.permittedInsecurePackages = [
@@ -58,10 +58,8 @@
           inherit system;
 
           modules = [
-            ./homelab.nix
-            ./homelab-hardware-configuration.nix
-            ./generic.nix
-            ./modules/shell.nix
+            ./server.nix
+            ./hardware-configuration/server.nix
 
             home-manager.nixosModules.home-manager
             {
@@ -70,7 +68,7 @@
                 useUserPackages = true;
                 sharedModules   = [ nixvim.homeModules.nixvim ];
                 users.seb = {
-                  imports          = [ ./home/shell.nix ];
+                  imports          = [ ./home/modules/shell.nix ];
                   home.stateVersion = "24.05";
                 };
               };
@@ -82,7 +80,7 @@
 
           modules = [
             ./work.nix
-            ./work-hardware-configuration.nix
+            ./hardware-configuration/work.nix
 
             home-manager.nixosModules.home-manager
             {

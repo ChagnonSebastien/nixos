@@ -5,7 +5,7 @@ in
 {
 
   imports = [
-    ./shell.nix
+    ./modules/shell.nix
   ];
 
   home.sessionVariables = rec {

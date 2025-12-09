@@ -1,21 +1,12 @@
 {
   imports = [
     ./generic.nix
+    ./modules/nvidia-gpu.nix
     ./modules/shell.nix
-    ./modules/desktop.nix
+    ./modules/docker-rootless.nix
+    ./desktop-envionment/shared.nix
+    ./desktop-envionment/hyprland.nix
   ];
-
-  boot.loader = {
-    efi.canTouchEfiVariables = true;
-    timeout = 10;
-    grub = {
-      enable = true;
-      device = "nodev";
-      efiSupport = true;
-      useOSProber = true;
-      default = 0;
-    };
-  };
 
   networking = {
     hostName = "DesktopL";
@@ -42,6 +33,15 @@
       extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" "vboxusers" ];
       initialPassword = "change-me";
     };
+  };
+
+  environment.systemPackages = with pkgs; [
+  ];
+
+  environment.sessionVariables = {
+  };
+
+  environment.variables = {
   };
 
   # This option defines the first version of NixOS you have installed on this particular machine,

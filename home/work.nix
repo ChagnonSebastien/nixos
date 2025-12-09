@@ -1,7 +1,8 @@
 { pkgs, ...}: {
 
   imports = [
-    ./shell.nix
+    ./modules/shell.nix
+    ./desktop-environment/plasma.nix
   ];
 
   home.packages = with pkgs; [
@@ -42,7 +43,17 @@
     gnumake
     postgresql
     protobuf
-];
+  ];
+
+  programs.zsh = {
+    shellAliases = {
+      vpn = "sudo bash aws-vpn.bash";
+      dev = "bash qohash-connection-script-aws.bash -e dev -a";
+      stg = "bash qohash-connection-script-aws.bash -e staging -a";
+      prd = "bash qohash-connection-script-aws.bash -e prod -a";
+      myip = "curl -s https://ipinfo.io/ip | wl-copy";
+    };
+  };
 
   xdg.mimeApps = {
     enable = true;
