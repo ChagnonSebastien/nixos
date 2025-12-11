@@ -25,7 +25,7 @@
         owner = "catppuccin";
         repo = "kitty";
         rev = "main";
-        sha256 = "1sfjwvn6xwc882mzv9nhb8wsw3q4kapypq7gh1dkq3jqcjc717b3";
+        sha256 = "1h9zqc6gcz9rpn7p6ir3jy9glnj336jdcz5ildagd0fm5kn8vlz7";
       }}/themes/mocha.conf
     '';
   };
