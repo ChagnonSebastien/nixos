@@ -13,16 +13,18 @@ in
   services.hyprpaper = {
     enable = true;
     settings = {
-      ipc = "on";
+      ipc = true;
       splash = false;
-      preload = [
-        "${wallpapers}/space_left.png"
-        "${wallpapers}/space_right.png"
-      ];
 
       wallpaper = [
-        "DP-2,${wallpapers}/space_left.png"
-        "DP-3,${wallpapers}/space_right.png"
+        {
+          monitor = "DP-2";
+          path = "${wallpapers}/space_left.png";
+        }
+        {
+          monitor = "DP-3";
+          path = "${wallpapers}/space_right.png";
+        }
       ];
     };
   };

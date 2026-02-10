@@ -34,13 +34,6 @@
             ./desktop.nix
             ./hardware-configuration/desktop.nix
 
-            ({...}: {
-              nixpkgs.config.permittedInsecurePackages = [
-                "beekeeper-studio-5.3.4"
-                "qtwebengine-5.15.19"
-              ];
-            })
-
             home-manager-unstable.nixosModules.home-manager
             {
               home-manager = {
@@ -49,7 +42,7 @@
                 sharedModules = [
                   nixvim-unstable.homeModules.nixvim 
                 ];
-                users.seb = ./home/home.nix;
+                users.seb = ./home/desktop.nix;
               };
             }
           ];

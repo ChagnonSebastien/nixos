@@ -154,8 +154,12 @@
         "$mainMod, mouse:273, resizewindow"
       ];
 
-      windowrulev2 = "suppressevent maximize, class:.*";
-    }; 
+      windowrule = {
+        name = "suppress-maximize";
+        "match:class" = ".*";
+        suppress_event = "maximize";
+      };
+    };
   };
 
   programs.hyprlock = {

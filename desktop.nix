@@ -1,11 +1,12 @@
+{ pkgs, ... }:
 {
   imports = [
     ./generic.nix
     ./modules/nvidia-gpu.nix
     ./modules/shell.nix
     ./modules/docker-rootless.nix
-    ./desktop-envionment/shared.nix
-    ./desktop-envionment/hyprland.nix
+    ./desktop-environment/shared.nix
+    ./desktop-environment/hyprland.nix
   ];
 
   networking = {

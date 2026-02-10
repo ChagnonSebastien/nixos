@@ -29,7 +29,7 @@
       export LIBGL_ALWAYS_SOFTWARE=1
       exec ${pkgs.beekeeper-studio}/bin/beekeeper-studio "$@"
     '')
-    jetbrains.idea-ultimate
+    jetbrains.idea
     wineWowPackages.waylandFull
     winetricks
     prismlauncher

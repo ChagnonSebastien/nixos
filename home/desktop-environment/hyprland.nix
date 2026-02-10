@@ -24,7 +24,7 @@
       include ${pkgs.fetchFromGitHub {
         owner = "catppuccin";
         repo = "kitty";
-        rev = "main";
+        rev = "b14e8385c827f2d41660b71c7fec1e92bdcf2676";
         sha256 = "1h9zqc6gcz9rpn7p6ir3jy9glnj336jdcz5ildagd0fm5kn8vlz7";
       }}/themes/mocha.conf
     '';
