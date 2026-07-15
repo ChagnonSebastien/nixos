@@ -1,18 +1,6 @@
 { pkgs, ... }:
 
 {
-  boot.loader = {
-    efi.canTouchEfiVariables = true;
-    timeout = 10;
-    grub = {
-      enable = true;
-      device = "nodev";
-      efiSupport = true;
-      useOSProber = true;
-      default = 0;
-    };
-  };
-
   nix = {
     gc = {
       automatic = true;

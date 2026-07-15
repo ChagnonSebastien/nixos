@@ -3,10 +3,10 @@
 
   inputs = {
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/release-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/release-26.05";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager-unstable = {
@@ -14,7 +14,7 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     nixvim = {
-      url = "github:nix-community/nixvim/nixos-25.11";
+      url = "github:nix-community/nixvim/nixos-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixvim-unstable = {
@@ -68,7 +68,7 @@
             }
           ];
         };
-	Work = nixpkgs.lib.nixosSystem {
+        Work = nixpkgs.lib.nixosSystem {
           inherit system;
 
           modules = [
@@ -96,6 +96,18 @@
             {
               wsl.enable = true;
               wsl.defaultUser = "seb";
+
+              virtualisation.docker = {
+                enable = true;
+                listenOptions = [ "/var/run/docker.sock" "127.0.0.1:2375" ];
+                autoPrune = {
+                  enable = true;
+                  dates = "weekly";
+                };
+              };
+
+              users.users.seb.extraGroups = [ "docker" ];
+
               system.stateVersion = "24.11";
             }
 

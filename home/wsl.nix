@@ -15,14 +15,21 @@ in
 
   home.packages = with pkgs; [
     awscli2
+    ssm-session-manager-plugin
     kubectl
     terraform
     openssl
     kubernetes-helm
     go
+    gcc
     k9s
     azure-cli
     icu
+    zip
+    postgresql
+
+    chromium
+    tinyproxy
   ];
 
   # The state version is required and should stay at the version you

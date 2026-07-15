@@ -14,6 +14,18 @@
     ./desktop-environment/plasma.nix
   ];
 
+  boot.loader = {
+    efi.canTouchEfiVariables = true;
+    timeout = 10;
+    grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      useOSProber = true;
+      default = 0;
+    };
+  };
+
   boot.extraModulePackages = with config.boot.kernelPackages; [
     v4l2loopback.out
   ];

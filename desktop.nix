@@ -8,6 +8,18 @@
     ./desktop-environment/shared.nix
     ./desktop-environment/hyprland.nix
   ];
+  
+  boot.loader = {
+    efi.canTouchEfiVariables = true;
+    timeout = 10;
+    grub = {
+      enable = true;
+      device = "nodev";
+      efiSupport = true;
+      useOSProber = true;
+      default = 0;
+    };
+  };
 
   networking = {
     hostName = "DesktopL";
