@@ -27,8 +27,6 @@ in
     icu
     zip
     postgresql
-
-    chromium
     tinyproxy
   ];
 
