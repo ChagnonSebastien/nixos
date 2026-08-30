@@ -6,6 +6,9 @@
     tlrc # tldr
     dust
 
+    inetutils
+    openssl
+
     superfile
     (writeShellScriptBin "spf" ''
       exec ${pkgs.superfile}/bin/superfile "$@"

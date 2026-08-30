@@ -62,7 +62,7 @@
     interface = "enp42s0";
   };
 
-  networking.nameservers = [ "8.8.8.8" "8.8.4.4" ];  # Replace with your preferred DNS servers
+  networking.nameservers = [ "192.168.0.2" ];  # Replace with your preferred DNS servers
 
   virtualisation.docker = {
     enable = true;
