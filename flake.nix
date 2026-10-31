@@ -61,7 +61,7 @@
                 useUserPackages = true;
                 sharedModules   = [ nixvim.homeModules.nixvim ];
                 users.seb = {
-                  imports          = [ ./home/modules/shell.nix ];
+                  imports          = [ ./home/modules/shell.nix ./home/modules/pi-hole-lists.nix ];
                   home.stateVersion = "24.05";
                 };
               };
