@@ -91,6 +91,8 @@
     #extraOptions = "--default-runtime=nvidia";
   };
 
+  systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/hdd-1" ];
+
   users.users.seb = {
     isNormalUser = true;
     extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" ];
