@@ -13,6 +13,8 @@
     (writeShellScriptBin "spf" ''
       exec ${pkgs.superfile}/bin/superfile "$@"
     '')
+
+    claude-code
   ];
 
   home = {

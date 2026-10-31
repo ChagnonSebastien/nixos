@@ -24,21 +24,10 @@
 
   # Use the systemd-boot EFI boot loader.
   boot.kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = "80";
-  boot.kernelParams = [ "nvidia-drm.fbdev=1"];
-
-  hardware.graphics.enable = true;
-  hardware.nvidia-container-toolkit.enable = true;
-  services.xserver.videoDrivers = ["nvidia"];
-  hardware.nvidia = {
-    modesetting.enable = true;
-    powerManagement.enable = true;
-    package = config.boot.kernelPackages.nvidiaPackages.vulkan_beta;
-    open = false;
-  };
+  boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
 
   environment.systemPackages = with pkgs; [
     nvidia-docker
-    cudatoolkit
     nvidia-container-toolkit
     libnvidia-container
   ];
