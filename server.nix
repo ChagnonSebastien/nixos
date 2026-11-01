@@ -11,6 +11,7 @@
   ];
 
   boot.loader = {
+    systemd-boot.configurationLimit = 10;
     efi.canTouchEfiVariables = true;
     timeout = 10;
     grub = {
@@ -88,6 +89,12 @@
       setSocketVariable = true;
     };
 
+    autoPrune = {
+      enable = true;
+      dates = "weekly";
+      flags = [ "--all" "--filter" "until=168h" ];
+    };
+
     #extraOptions = "--default-runtime=nvidia";
   };
 
@@ -97,6 +104,7 @@
     isNormalUser = true;
     extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" ];
     initialPassword = "change-me";
+    linger = true;
   };
 
   services.openssh.enable = true;

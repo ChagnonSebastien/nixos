@@ -30,6 +30,16 @@
     };
   };
 
+  services.home-manager.autoExpire = {
+    enable = true;
+    frequency = "weekly";
+    timestamp = "-14 days";
+    store = {
+      cleanup = true;
+      options = "--delete-older-than 14d";
+    };
+  };
+
   programs.nixvim = {
     enable = true;
 

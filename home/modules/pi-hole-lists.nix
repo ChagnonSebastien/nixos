@@ -196,6 +196,7 @@ let
 
       # YouTube thumbnails
       i.ytimg.com
+      youtubei.googleapis.com
     '';
 
     "allow/guest" = ''
