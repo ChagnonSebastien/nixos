@@ -42,6 +42,7 @@
 
   programs.nixvim = {
     enable = true;
+    nixpkgs.useGlobalPackages = true;
 
     colorschemes.catppuccin.enable = true;
 
