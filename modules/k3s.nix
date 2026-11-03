@@ -82,8 +82,6 @@ in
       "--disable traefik"
       "--node-label=nixos-nvidia-cdi=enabled"
       "--node-label=nvidia.com/gpu.present=true"
-      "--node-label=nvidia.com/mps.capable=true"
-      "--node-label=nvidia.com/device-plugin.config=gtx1080ti"
       "--container-runtime-endpoint"
       "unix:///run/containerd/containerd.sock"
     ];
