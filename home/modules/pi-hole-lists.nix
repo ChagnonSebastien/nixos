@@ -177,7 +177,7 @@ let
 
     "allow/phone" = ''
       # Android phone allow list (assign to Phone group)
-      # Last updated: 2026-10-31
+      # Last updated: 2026-11-02
 
       # Google APIs, Play Store
       www.googleapis.com
@@ -197,6 +197,13 @@ let
       # YouTube thumbnails
       i.ytimg.com
       youtubei.googleapis.com
+
+      # LaunchDarkly feature flags; Wealthsimple hides the Rewards Offers tab without it
+      events.launchdarkly.com
+
+      # Meta Graph API; Messenger cannot submit forms without it.
+      # Blocked upstream by hagezi ultimate.txt as ||graph.facebook.com^
+      graph.facebook.com
     '';
 
     "allow/guest" = ''
