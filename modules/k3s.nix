@@ -79,6 +79,11 @@ in
     extraFlags = [
       "--write-kubeconfig-group=k3s"
       "--write-kubeconfig-mode=0640"
+      # Encrypt Secrets at rest in the datastore. Without this k3s stores them
+      # base64-encoded but in the clear, so anything that reads
+      # /var/lib/rancher/k3s/server/db -- including a backup of it -- reads
+      # every credential. See services/k8s/external-secrets.
+      "--secrets-encryption"
       "--disable traefik"
       "--node-label=nixos-nvidia-cdi=enabled"
       "--node-label=nvidia.com/gpu.present=true"
