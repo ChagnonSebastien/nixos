@@ -15,6 +15,7 @@
     '')
 
     claude-code
+    python3
   ];
 
   home = {
