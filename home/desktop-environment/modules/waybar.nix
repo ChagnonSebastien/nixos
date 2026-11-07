@@ -1,9 +1,37 @@
-{ config, pkgs, lib, ...}: {  
+{ pkgs, lib, ... }:
+let
+  wireguard = lib.getExe (pkgs.writeShellApplication {
+    name = "waybar-wireguard";
+    runtimeInputs = with pkgs; [ networkmanager procps ];
+    text = ''
+      active() {
+        nmcli -t -f NAME,TYPE connection show --active | awk -F: '$2 == "wireguard" && !found { print $1; found = 1 }'
+      }
 
-  home.packages = with pkgs; [
-    waybar
-  ];
-
+      case "''${1:-status}" in
+        status)
+          current=$(active)
+          echo "   ''${current:-direct}"
+          ;;
+        next)
+          mapfile -t locations < <(nmcli -t -f NAME,TYPE connection show | awk -F: '$2 == "wireguard" { print $1 }' | sort)
+          locations+=(direct)
+          current=$(active)
+          current=''${current:-direct}
+          next=''${locations[0]}
+          for i in "''${!locations[@]}"; do
+            if [[ "''${locations[$i]}" == "$current" ]]; then
+              next=''${locations[$(( (i + 1) % ''${#locations[@]} ))]}
+            fi
+          done
+          if [[ "$current" != direct ]]; then nmcli connection down "$current" >/dev/null; fi
+          if [[ "$next" != direct ]]; then nmcli connection up "$next" >/dev/null; fi
+          pkill -RTMIN+8 waybar || true
+          ;;
+      esac
+    '';
+  });
+in {
   programs.waybar = {
     enable = true;
     systemd.enable = true; # started with graphical-session.target (UWSM)
@@ -36,62 +64,10 @@
         };
 
         "custom/network_toggle" = {
-          exec = pkgs.writeShellScript "get_wireguard_connection" ''
-            sleep 0.5
-            CONNECTION=$(nmcli connection | grep -i -E 'wireguard +[-a-z0-9]{3,}' | awk '{print $1}')
-            if [[ -z "$CONNECTION" ]]; then
-              echo "   home"
-            else
-              echo "   $CONNECTION"
-            fi
-          '';
-          on-click = pkgs.writeShellScript "next_wireguard_connection"  ''
-            #!/bin/bash
-
-            # WireGuard connection names
-            LOCATIONS=( $(nmcli connection | awk '/wireguard/ {print $1}' | sort) "home" )
-            get_wireguard_connection() {
-              CONNECTION=$(nmcli connection | grep -i -E 'wireguard +[-a-z0-9]{3,}' | awk '{print $1}')
-              if [[ -z "$CONNECTION" ]]; then
-                echo "home"
-              else
-                echo "$CONNECTION"
-              fi
-            }
-
-            get_current_index() {
-              for i in "''${!LOCATIONS[@]}"; do
-                if [[ "''${LOCATIONS[$i]}" == "$1" ]]; then
-                  echo $i
-                  return
-                fi
-              done
-              echo -1
-            }
-
-            # Get the current WireGuard connection
-            CURRENT_CONNECTION=$(get_wireguard_connection)
-            CURRENT_INDEX=$(get_current_index "$CURRENT_CONNECTION")
-
-            # Determine the next connection index
-            if [[ $CURRENT_INDEX -ge 0 ]]; then
-              NEXT_INDEX=$(( (CURRENT_INDEX + 1) % ''${#LOCATIONS[@]} ))
-            else
-              NEXT_INDEX=0
-            fi
-
-            # Bring down any active WireGuard connection
-            nmcli connection down "$CURRENT_CONNECTION" 2>/dev/null
-
-            # Bring up the next connection if it's not "home"
-            NEXT_CONNECTION="''${LOCATIONS[$NEXT_INDEX]}"
-            if [[ "$NEXT_CONNECTION" != "home" ]]; then
-              nmcli connection up "$NEXT_CONNECTION"
-            fi
-
-          '';
-          exec-on-event = true;
-          interval = 10;
+          exec = "${wireguard} status";
+          on-click = "${wireguard} next";
+          signal = 8;
+          interval = 60;
         };
 
         "hyprland/workspaces" = {
@@ -105,7 +81,7 @@
             "4" = " ";
             "5" = " ";
             urgent = " ";
-            focused = " ";
+            active = " ";
             default = " ";
           };
         };
@@ -135,13 +111,13 @@
         "clock" = {
           tooltip-format = "<tt><small>{calendar}</small></tt>";
           format = "{:%Y-%m-%d %H:%M}";
-        };
-        "calendar" = {
-          mode = "year";
-          mode-mon-col = 3;
-          on-scroll = 1;
-          format = {
-            today = "<span color='#ff6699'><b><u>{}</u></b></span>";
+          calendar = {
+            mode = "year";
+            mode-mon-col = 3;
+            on-scroll = 1;
+            format = {
+              today = "<span color='#ff6699'><b><u>{}</u></b></span>";
+            };
           };
           actions = {
             on-scroll-up = "shift_up";
@@ -155,8 +131,8 @@
           format = "   {}%";
         };
         "temperature" = {
-          thermal-zone = 2;
-          hwmon-path = "/sys/class/hwmon/hwmon1/temp1_input";
+          hwmon-path-abs = "/sys/devices/platform/coretemp.0/hwmon";
+          input-filename = "temp1_input";
           critical-threshold = 80;
           format-critical = "{icon} {temperatureC}°C";
           format = "{icon} {temperatureC}°C";
@@ -194,7 +170,7 @@
     };
     style = ''
       * {
-        font-family: "Noto Sans CJK KR Regular";
+        font-family: "FiraCode Nerd Font Propo", "Noto Sans CJK KR";
         font-size: 13px;
         min-height: 0;
       }
@@ -226,7 +202,7 @@
         border-bottom: 2px solid #c9545d;
       }
 
-      #workspace button.active {
+      #workspaces button.active {
         background-color: rgba(255, 255, 255, 0.5);
       }
       
