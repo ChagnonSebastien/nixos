@@ -32,13 +32,24 @@ let
     '';
   });
 
-  gpu = lib.getExe (pkgs.writeShellApplication {
-    name = "waybar-gpu";
+  stats = lib.getExe (pkgs.writeShellApplication {
+    name = "waybar-stats";
     text = ''
-      IFS=', ' read -r usage temp < <(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits)
+      cpu_sample() { awk '/^cpu / { print $2 + $3 + $4 + $5 + $6 + $7 + $8, $5 + $6 }' /proc/stat; }
+      read -r total1 idle1 < <(cpu_sample)
+      sleep 1
+      read -r total2 idle2 < <(cpu_sample)
+      cpu=$(( 100 * ((total2 - total1) - (idle2 - idle1)) / (total2 - total1) ))
+
+      read -r mem_used mem_total < <(awk '/^MemTotal/ { t = $2 } /^MemAvailable/ { a = $2 } END { printf "%.1f %.1f\n", (t - a) / 1048576, t / 1048576 }' /proc/meminfo)
+      cpu_temp=$(( $(cat /sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input) / 1000 ))
+      IFS=', ' read -r gpu_usage gpu_temp gpu_mem_used gpu_mem_total < <(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,memory.used,memory.total --format=csv,noheader,nounits)
+
       class=""
-      if (( temp >= 80 )); then class="critical"; fi
-      printf '{"text": "%s  %s%% %s°C", "class": "%s"}\n' "󰢮" "$usage" "$temp" "$class"
+      if (( cpu_temp >= 80 || gpu_temp >= 80 )); then class="critical"; fi
+
+      tooltip="<tt>CPU   $cpu%   $cpu_temp°C\nRAM   $mem_used / $mem_total GiB\nGPU   $gpu_usage%   $gpu_temp°C\nVRAM  $(( gpu_mem_used / 1024 )) / $(( gpu_mem_total / 1024 )) GiB</tt>"
+      printf '{"text": "%s", "tooltip": "%s", "class": "%s"}\n' "󰍛" "$tooltip" "$class"
     '';
   });
 in {
@@ -50,27 +61,12 @@ in {
         height = 24;
         modules-left = [ "hyprland/workspaces" "hyprland/submap" "mpris"];
         modules-center = [ "hyprland/window" ];
-        modules-right = [ "keyboard-state" "group/stats" "network" "custom/network_toggle" "pulseaudio" "tray" "clock" "custom/notification" ];
+        modules-right = [ "keyboard-state" "custom/stats" "network" "custom/network_toggle" "pulseaudio" "tray" "clock" "custom/notification" ];
         
-        "group/stats" = {
-          orientation = "inherit";
-          drawer = {
-            transition-duration = 300;
-            transition-left-to-right = false;
-          };
-          modules = [ "custom/stats" "temperature" "cpu" "memory" "custom/gpu" ];
-        };
-
         "custom/stats" = {
-          format = "󰍛";
-          tooltip = false;
-        };
-
-        "custom/gpu" = {
-          exec = gpu;
+          exec = stats;
           return-type = "json";
           interval = 5;
-          tooltip = false;
         };
 
         "custom/notification" = {
@@ -154,20 +150,6 @@ in {
             on-scroll-up = "shift_up";
             on-scroll-down = "shift_down";
           };
-        };
-        "cpu" = {
-          format = "   {usage}%";
-        };
-        "memory" = {
-          format = "   {}%";
-        };
-        "temperature" = {
-          hwmon-path-abs = "/sys/devices/platform/coretemp.0/hwmon";
-          input-filename = "temp1_input";
-          critical-threshold = 80;
-          format-critical = "{icon} {temperatureC}°C";
-          format = "{icon} {temperatureC}°C";
-          format-icons = [""];
         };
         "network" = {
           format-wifi = "{essid} ({signalStrength}%) ";
@@ -267,13 +249,18 @@ in {
         font-weight: bold;
       }
 
-      #custom-stats, #temperature, #cpu, #memory, #custom-gpu {
+      #custom-stats {
         color: @subtext0;
       }
 
+      tooltip {
+        background-color: @base;
+        border: 1px solid @surface1;
+        border-radius: 6px;
+      }
+
       #network.disconnected,
-      #temperature.critical,
-      #custom-gpu.critical {
+      #custom-stats.critical {
         background-color: @red;
         color: @crust;
       }
