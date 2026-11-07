@@ -6,24 +6,11 @@
 {
   imports = [
     ./generic.nix
+    ./modules/boot-grub.nix
     ./modules/shell.nix
     ./modules/nvidia-gpu.nix
   ];
 
-  boot.loader = {
-    systemd-boot.configurationLimit = 10;
-    efi.canTouchEfiVariables = true;
-    timeout = 10;
-    grub = {
-      enable = true;
-      device = "nodev";
-      efiSupport = true;
-      useOSProber = true;
-      default = 0;
-    };
-  };
-
-  # Use the systemd-boot EFI boot loader.
   boot.kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = "80";
   boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
 
