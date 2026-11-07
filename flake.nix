@@ -30,12 +30,23 @@
     let
       system = "x86_64-linux";
 
+      unstableOverlay = _final: prev: {
+        inherit (import nixpkgs-unstable {
+          inherit system;
+          inherit (prev) config;
+        }) claude-code;
+      };
+
       # Each channel pins nixpkgs, home-manager and nixvim together.
-      stable   = { inherit nixpkgs home-manager nixvim; };
+      stable   = {
+        inherit nixpkgs home-manager nixvim;
+        overlays = [ unstableOverlay ];
+      };
       unstable = {
         nixpkgs      = nixpkgs-unstable;
         home-manager = home-manager-unstable;
         nixvim       = nixvim-unstable;
+        overlays     = [ ];
       };
 
       # A NixOS host with home-manager (and nixvim) wired up for user seb.
@@ -54,6 +65,7 @@
             ./modules/fonts.nix
             ./hosts/${name}
             { networking.hostName = name; }
+            { nixpkgs.overlays = channel.overlays; }
             channel.home-manager.nixosModules.home-manager
             {
               home-manager = {

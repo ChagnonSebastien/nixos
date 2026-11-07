@@ -8,6 +8,8 @@ let
 in
 {
   environment.systemPackages = with pkgs; [
+    kubectl
+    kubernetes-helm
     runc
     openiscsi
     nvidia-container-toolkit
@@ -40,7 +42,8 @@ in
                 privileged_without_host_devices = false;
                 runtime_type = "io.containerd.runc.v2";
                 options = {
-                  BinaryName = "${pkgs.nvidia-container-toolkit}/bin/nvidia-container-runtime";
+                  # `out` only ships nvidia-ctk
+                  BinaryName = "${pkgs.nvidia-container-toolkit.tools}/bin/nvidia-container-runtime";
 
                   hooks = {
                     prestart = {
@@ -53,9 +56,10 @@ in
             };
           };
         };
+        # /opt/cni/bin holds dangling symlinks; these exist once k3s first starts
         "io.containerd.grpc.v1.cri".cni = {
-          bin_dir  = "/opt/cni/bin";
-          conf_dir = "/etc/cni/net.d";
+          bin_dir  = "/var/lib/rancher/k3s/data/current/bin";
+          conf_dir = "/var/lib/rancher/k3s/agent/etc/cni/net.d";
         };
       };
     };
@@ -69,10 +73,13 @@ in
     flannel
   ];
 
+  environment.sessionVariables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
+
   services.k3s = {
-    enable = false;
+    enable = true;
     role = "server";
-    clusterInit = true;
+
+    # no clusterInit: etcd cannot be migrated back to sqlite
     extraFlags = [
       "--write-kubeconfig-group=k3s"
       "--write-kubeconfig-mode=0640"
