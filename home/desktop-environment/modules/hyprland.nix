@@ -1,5 +1,13 @@
 { config, pkgs, lib, ...}: {
 
+  home.pointerCursor = {
+    enable = true;
+    package = pkgs.catppuccin-cursors.mochaDark;
+    name = "catppuccin-mocha-dark-cursors";
+    size = 24;
+    gtk.enable = true;
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     # UWSM (programs.hyprland.withUWSM) owns the systemd session targets. HM's
@@ -32,6 +40,8 @@
       -- Environment
       hl.env("XCURSOR_SIZE", "24")
       hl.env("HYPRCURSOR_SIZE", "24")
+      hl.env("XCURSOR_THEME", "catppuccin-mocha-dark-cursors")
+      hl.env("HYPRCURSOR_THEME", "catppuccin-mocha-dark-cursors")
       hl.env("LIBVA_DRIVER_NAME", "nvidia")
       hl.env("XDG_SESSION_TYPE", "wayland")
       hl.env("GBM_BACKEND", "nvidia-drm")

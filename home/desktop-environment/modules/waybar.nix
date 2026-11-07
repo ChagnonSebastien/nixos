@@ -31,6 +31,16 @@ let
       esac
     '';
   });
+
+  gpu = lib.getExe (pkgs.writeShellApplication {
+    name = "waybar-gpu";
+    text = ''
+      IFS=', ' read -r usage temp < <(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits)
+      class=""
+      if (( temp >= 80 )); then class="critical"; fi
+      printf '{"text": "%s  %s%% %s°C", "class": "%s"}\n' "󰢮" "$usage" "$temp" "$class"
+    '';
+  });
 in {
   programs.waybar = {
     enable = true;
@@ -40,8 +50,29 @@ in {
         height = 24;
         modules-left = [ "hyprland/workspaces" "hyprland/submap" "mpris"];
         modules-center = [ "hyprland/window" ];
-        modules-right = [ "keyboard-state" "temperature" "cpu" "memory" "network" "custom/network_toggle" "pulseaudio" "tray" "clock" "custom/notification" ];
+        modules-right = [ "keyboard-state" "group/stats" "network" "custom/network_toggle" "pulseaudio" "tray" "clock" "custom/notification" ];
         
+        "group/stats" = {
+          orientation = "inherit";
+          drawer = {
+            transition-duration = 300;
+            transition-left-to-right = false;
+          };
+          modules = [ "custom/stats" "temperature" "cpu" "memory" "custom/gpu" ];
+        };
+
+        "custom/stats" = {
+          format = "󰍛";
+          tooltip = false;
+        };
+
+        "custom/gpu" = {
+          exec = gpu;
+          return-type = "json";
+          interval = 5;
+          tooltip = false;
+        };
+
         "custom/notification" = {
           tooltip = false;
           format = "{} {icon}";
@@ -116,7 +147,7 @@ in {
             mode-mon-col = 3;
             on-scroll = 1;
             format = {
-              today = "<span color='#ff6699'><b><u>{}</u></b></span>";
+              today = "<span color='#cba6f7'><b><u>{}</u></b></span>";
             };
           };
           actions = {
@@ -169,75 +200,95 @@ in {
       };
     };
     style = ''
+      @define-color base #1e1e2e;
+      @define-color crust #11111b;
+      @define-color surface0 #313244;
+      @define-color surface1 #45475a;
+      @define-color text #cdd6f4;
+      @define-color subtext0 #a6adc8;
+      @define-color mauve #cba6f7;
+      @define-color red #f38ba8;
+      @define-color peach #fab387;
+
       * {
         font-family: "FiraCode Nerd Font Propo", "Noto Sans CJK KR";
         font-size: 13px;
         min-height: 0;
       }
-      
+
       window#waybar {
-        background-color: rgba(43, 48, 59, 0.5);
-        border-bottom: 1px solid rgba(100, 114, 125, 0.5);
-        color: #ffffff;
+        background-color: alpha(@base, 0.85);
+        border-bottom: 1px solid @surface0;
+        color: @text;
         transition-property: background-color;
         transition-duration: .5s;
       }
-      
+
       window#waybar.hidden {
         opacity: 0.2;
       }
-      
+
       #waybar.empty #window {
         background-color: transparent;
       }
-      
+
       .modules-right .module, #workspaces button {
         padding: 0px 6px;
         border: none;
         border-radius: 0;
+        color: @text;
       }
-      
+
       .modules-right .module:hover, #workspaces button:hover {
         background: inherit;
-        border-bottom: 2px solid #c9545d;
+        border-bottom: 2px solid @mauve;
       }
 
       #workspaces button.active {
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: @surface1;
+        border-bottom: 2px solid @mauve;
       }
-      
+
       #workspaces button.urgent {
-        background-color: #eb4d4b;
+        background-color: @red;
+        color: @crust;
       }
-      
+
       #window {
         margin: 0px 2px;
         padding-left: 8px;
         padding-right: 8px;
-        background-color: rgba(0,0,0,0.3);
-        font-size:14px;
+        background-color: @surface0;
+        font-size: 14px;
         font-weight: bold;
       }
-      
+
       #clock {
         font-weight: bold;
       }
-      
-      #network.disconnected {
-        background-color: #f53c3c;
+
+      #custom-stats, #temperature, #cpu, #memory, #custom-gpu {
+        color: @subtext0;
       }
-      
-      #temperature.critical {
-        background-color: #eb4d4b;
+
+      #network.disconnected,
+      #temperature.critical,
+      #custom-gpu.critical {
+        background-color: @red;
+        color: @crust;
       }
-      
+
+      #pulseaudio.muted {
+        color: @peach;
+      }
+
       #tray > .passive {
         -gtk-icon-effect: dim;
       }
-      
+
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
-        background-color: #eb4d4b;
+        background-color: @red;
       }
     '';
   };
