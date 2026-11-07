@@ -194,26 +194,30 @@
     font = "FiraCode Nerd Font Propo";
     mocha = {
       base = "rgb(1e1e2e)";
-      mantle = "rgba(181825cc)";
+      baseBar = "rgba(1e1e2ed9)";
+      basePanel = "rgba(1e1e2ef2)";
       surface0 = "rgb(313244)";
+      surface1 = "rgb(45475a)";
+      mauve = "rgb(cba6f7)";
       text = "rgb(cdd6f4)";
       subtext0 = "rgb(a6adc8)";
-      overlay1 = "rgb(7f849c)";
-      mauve = "rgb(cba6f7)";
       red = "rgb(f38ba8)";
       peach = "rgb(fab387)";
       yellow = "rgb(f9e2af)";
     };
-    powerButton = icon: cmd: x: {
+    barLabel = attrs: {
       monitor = "";
-      text = icon;
-      color = mocha.overlay1;
-      font_size = 22;
+      color = mocha.text;
+      font_size = 10;
       font_family = font;
+      valign = "top";
+      zindex = 2;
+    } // attrs;
+    powerButton = icon: cmd: x: barLabel {
+      text = icon;
       onclick = cmd;
-      position = "${toString x}, 40";
-      halign = "right";
-      valign = "bottom";
+      position = "${toString x}, -4";
+      halign = "left";
     };
   in {
     enable = true;
@@ -221,78 +225,101 @@
       general = {
         hide_cursor = false;
         ignore_empty_input = true;
-        grace = 1;
       };
 
       background = map (w: {
         inherit (w) monitor path;
         color = mocha.base;
-        blur_passes = 3;
-        blur_size = 6;
-        brightness = 0.6;
-        vibrancy = 0.17;
+        blur_passes = 2;
+        blur_size = 4;
+        brightness = 0.75;
       }) config.services.hyprpaper.settings.wallpaper;
 
       shape = [
         {
           monitor = "";
-          size = "420, 440";
-          color = mocha.mantle;
-          rounding = 16;
+          size = "100%, 24";
+          color = mocha.baseBar;
+          position = "0, 0";
+          halign = "center";
+          valign = "top";
+        }
+        {
+          monitor = "";
+          size = "100%, 1";
+          color = mocha.surface0;
+          position = "0, -24";
+          halign = "center";
+          valign = "top";
+        }
+        {
+          monitor = "";
+          size = "72, 24";
+          color = mocha.surface1;
+          position = "0, 0";
+          halign = "center";
+          valign = "top";
+          zindex = 1;
+        }
+        {
+          monitor = "";
+          size = "72, 2";
+          color = mocha.mauve;
+          position = "0, -22";
+          halign = "center";
+          valign = "top";
+          zindex = 2;
+        }
+        {
+          monitor = "";
+          size = "340, 110";
+          color = mocha.basePanel;
+          rounding = 6;
           border_size = 1;
-          border_color = mocha.surface0;
-          position = "0, 40";
+          border_color = mocha.surface1;
+          position = "0, 0";
           halign = "center";
           valign = "center";
         }
       ];
 
       label = [
+        (powerButton "󰤄" "systemctl suspend" 6)
+        (powerButton "󰜉" "systemctl reboot" 30)
+        (powerButton "󰐥" "systemctl poweroff" 54)
+        (barLabel {
+          text = "<b>locked</b>";
+          font_size = 11;
+          position = "0, -4";
+          halign = "center";
+        })
+        (barLabel {
+          text = "cmd[update:1000] date +'<b>%Y-%m-%d %H:%M</b>'";
+          position = "-6, -4";
+          halign = "right";
+        })
         {
           monitor = "";
-          text = "$TIME";
+          text = "<b>$USER</b>";
           color = mocha.text;
-          font_size = 96;
-          font_family = "${font} Bold";
-          position = "0, 150";
-          halign = "center";
-          valign = "center";
-        }
-        {
-          monitor = "";
-          text = "cmd[update:60000] date +'%A %-d %B'";
-          color = mocha.mauve;
-          font_size = 20;
+          font_size = 11;
           font_family = font;
-          position = "0, 60";
+          position = "0, 28";
           halign = "center";
           valign = "center";
         }
-        {
-          monitor = "";
-          text = "  $USER";
-          color = mocha.subtext0;
-          font_size = 14;
-          font_family = font;
-          position = "0, -10";
-          halign = "center";
-          valign = "center";
-        }
-        (powerButton "󰤄" "systemctl suspend" (-140))
-        (powerButton "󰜉" "systemctl reboot" (-90))
-        (powerButton "󰐥" "systemctl poweroff" (-40))
       ];
 
       input-field = [
         {
           monitor = "";
-          size = "300, 50";
+          size = "300, 34";
           outline_thickness = 2;
-          rounding = 10;
+          rounding = 0;
           dots_size = 0.25;
           dots_spacing = 0.3;
           dots_center = true;
-          outer_color = mocha.mauve;
+          outer_color = mocha.surface1;
           inner_color = mocha.surface0;
           font_color = mocha.text;
           check_color = mocha.yellow;
@@ -300,10 +327,9 @@
           capslock_color = mocha.peach;
           font_family = font;
           fade_on_empty = false;
-          hide_input = false;
-          placeholder_text = "<span foreground=\"##a6adc8\">Password</span>";
+          placeholder_text = "<span foreground=\"##a6adc8\">password</span>";
           fail_text = "$FAIL ($ATTEMPTS)";
-          position = "0, -90";
+          position = "0, -14";
           halign = "center";
           valign = "center";
         }
