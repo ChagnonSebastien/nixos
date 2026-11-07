@@ -62,6 +62,8 @@
                 sharedModules   = [
                   channel.nixvim.homeModules.nixvim
                   ./home/modules/shell.nix
+                  ./home/modules/nvim.nix
+                  ./home/modules/git.nix
                 ];
                 users.seb       = ./hosts/${name}/home.nix;
               };
