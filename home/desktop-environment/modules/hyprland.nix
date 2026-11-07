@@ -155,6 +155,14 @@
 
       -- Window rules
       hl.window_rule({
+          name  = "btop-float",
+          match = { class = "btop-float" },
+          float = true,
+          size  = "1400 800",
+          move  = "monitor_w-window_w-10 34",
+      })
+
+      hl.window_rule({
           name  = "suppress-maximize",
           match = { class = ".*" },
           suppress_event = "maximize",

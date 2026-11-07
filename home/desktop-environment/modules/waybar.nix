@@ -75,6 +75,7 @@ in {
           exec = stats;
           return-type = "json";
           interval = 5;
+          on-click = "kitty --class btop-float btop";
         };
 
         "custom/notification" = {
