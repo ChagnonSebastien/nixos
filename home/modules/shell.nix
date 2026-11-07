@@ -95,8 +95,9 @@
     settings = {
       enter_accept = true;
     };
+    forceOverwriteSettings = true;
   };
-  
+
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
