@@ -1,9 +1,6 @@
 { pkgs, ... }:
 {
-  environment.sessionVariables = {
-    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-    NIXOS_OZONE_WL = "1";
-  };
+  imports = [ ./ozone-wayland.nix ];
 
   # Enable the X11 windowing system.
   # You can disable this if you're only using the Wayland session.

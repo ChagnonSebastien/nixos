@@ -8,7 +8,6 @@
     k9s
     terraform
     azure-cli
-    openssl
     go
     gcc
     postgresql

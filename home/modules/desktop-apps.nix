@@ -8,6 +8,8 @@
     bitwarden-cli
     vscodium
     obs-studio
+    wl-clipboard # Clipboard CLI
+    cliphist # Clipboard history
     beekeeper-studio
     (writeShellScriptBin "beekeeper" ''
       export LIBGL_ALWAYS_SOFTWARE=1

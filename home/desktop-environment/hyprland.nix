@@ -11,8 +11,6 @@
     satty # Screenshoot editor
     grim # Screenshot from wayland compositor
     slurp # Screenshot zone selection
-    wl-clipboard # Clipboard CLI
-    cliphist # Clipboard history
   ];
 
   programs.kitty = {

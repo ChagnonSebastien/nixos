@@ -7,8 +7,12 @@
   imports = [
     ./hardware.nix
     ../../modules/common.nix
+    ../../modules/user.nix
+    ../../modules/kvm.nix
     ../../modules/boot-grub.nix
     ../../modules/shell.nix
+    ../../modules/cli-tools.nix
+    ../../modules/fonts.nix
     ../../modules/nvidia-gpu.nix
   ];
 
@@ -88,9 +92,7 @@
   systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/hdd-1" ];
 
   users.users.seb = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" ];
-    initialPassword = "change-me";
+    extraGroups = [ "docker" ];
     linger = true;
   };
 

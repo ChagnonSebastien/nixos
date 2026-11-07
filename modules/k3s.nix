@@ -8,7 +8,6 @@ let
 in
 {
   environment.systemPackages = with pkgs; [
-    cudatoolkit
     nvidia-docker
     runc
     openiscsi

@@ -8,8 +8,13 @@
   imports = [
     ./hardware.nix
     ../../modules/common.nix
+    ../../modules/user.nix
+    ../../modules/kvm.nix
     ../../modules/boot-grub.nix
     ../../modules/shell.nix
+    ../../modules/cli-tools.nix
+    ../../modules/fonts.nix
+    ../../modules/devtools.nix
     ../../modules/nvidia-gpu.nix
     ../../modules/docker-rootless.nix
     ../../modules/desktop-environment/shared.nix
@@ -32,14 +37,9 @@
 
   networking.networkmanager.enable = true;
 
-  environment.sessionVariables = {
-    GOPRIVATE = "gitlab.com/qohash/*";
-  };
-
   users.users.seb = {
-    isNormalUser = true;
     description = "seb";
-    extraGroups = [ "networkmanager" "seat" "video" "input" "audio" "wheel" "vboxusers" ];
+    extraGroups = [ "vboxusers" ];
     packages = with pkgs; [
       kdePackages.kate
     ];

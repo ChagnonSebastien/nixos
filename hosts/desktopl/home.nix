@@ -31,8 +31,6 @@
     #(writeShellScriptBin "google-chrome" ''
     #  exec ${pkgs.chromium}/bin/chromium "$@"
     #'')
-
-    claude-code
   ];
 
   xdg.mimeApps.defaultApplications = {

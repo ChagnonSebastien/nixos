@@ -10,8 +10,6 @@
   home.packages = with pkgs; [
     slack
     mpv
-    wl-clipboard # Clipboard CLI
-    cliphist # Clipboard history
     jetbrains.idea
 
     corretto21

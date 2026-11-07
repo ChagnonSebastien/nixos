@@ -9,8 +9,7 @@ in
     ../../home/modules/devtools.nix
   ];
 
-  home.sessionVariables = rec {
-    GOPRIVATE = "gitlab.com/qohash/*";
+  home.sessionVariables = {
     PATH = "${userBin}:$PATH";
   };
 
