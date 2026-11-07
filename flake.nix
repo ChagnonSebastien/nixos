@@ -43,10 +43,15 @@
       # `nixos-rebuild switch --flake .` always finds the right config.
       # Config lives in hosts/<name>/: default.nix (system, imports its
       # hardware.nix) and home.nix (home-manager for seb).
+      # Every host gets the base modules below; hosts import the rest.
       mkHost = name: { channel, extraModules ? [ ] }:
         channel.nixpkgs.lib.nixosSystem {
           inherit system;
           modules = extraModules ++ [
+            ./modules/common.nix
+            ./modules/shell.nix
+            ./modules/cli-tools.nix
+            ./modules/fonts.nix
             ./hosts/${name}
             { networking.hostName = name; }
             channel.home-manager.nixosModules.home-manager
@@ -54,7 +59,10 @@
               home-manager = {
                 useGlobalPkgs   = true;
                 useUserPackages = true;
-                sharedModules   = [ channel.nixvim.homeModules.nixvim ];
+                sharedModules   = [
+                  channel.nixvim.homeModules.nixvim
+                  ./home/modules/shell.nix
+                ];
                 users.seb       = ./hosts/${name}/home.nix;
               };
             }

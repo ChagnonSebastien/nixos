@@ -1,7 +1,6 @@
 { ... }:
 {
   imports = [
-    ../../home/modules/shell.nix
     ../../home/modules/pi-hole-lists
   ];
 

@@ -7,13 +7,9 @@
 {
   imports = [
     ./hardware.nix
-    ../../modules/common.nix
     ../../modules/user.nix
     ../../modules/kvm.nix
     ../../modules/boot-grub.nix
-    ../../modules/shell.nix
-    ../../modules/cli-tools.nix
-    ../../modules/fonts.nix
     ../../modules/devtools.nix
     ../../modules/nvidia-gpu.nix
     ../../modules/docker-rootless.nix

@@ -1,10 +1,6 @@
 { ... }:
 {
   imports = [
-    ../../modules/common.nix
-    ../../modules/shell.nix
-    ../../modules/cli-tools.nix
-    ../../modules/fonts.nix
     ../../modules/devtools.nix
   ];
 

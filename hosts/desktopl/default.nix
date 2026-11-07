@@ -2,14 +2,10 @@
 {
   imports = [
     ./hardware.nix
-    ../../modules/common.nix
     ../../modules/user.nix
     ../../modules/kvm.nix
     ../../modules/boot-grub.nix
     ../../modules/nvidia-gpu.nix
-    ../../modules/shell.nix
-    ../../modules/cli-tools.nix
-    ../../modules/fonts.nix
     ../../modules/docker-rootless.nix
     ../../modules/desktop-environment/shared.nix
     ../../modules/desktop-environment/hyprland.nix

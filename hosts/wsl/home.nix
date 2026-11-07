@@ -5,7 +5,6 @@ in
 {
 
   imports = [
-    ../../home/modules/shell.nix
     ../../home/modules/devtools.nix
   ];
 

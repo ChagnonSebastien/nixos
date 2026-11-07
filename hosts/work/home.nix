@@ -1,7 +1,6 @@
 { pkgs, ...}: {
 
   imports = [
-    ../../home/modules/shell.nix
     ../../home/modules/desktop-apps.nix
     ../../home/modules/devtools.nix
     ../../home/desktop-environment/plasma.nix
