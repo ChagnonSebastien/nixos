@@ -24,15 +24,10 @@
       local launcher    = "rofi -show drun"
       local mainMod     = "SUPER"
 
-      -- Autostart
-      hl.on("hyprland.start", function()
-          hl.exec_cmd("waybar")
-          hl.exec_cmd("wl-paste --type text --watch cliphist store")  -- Stores only text data
-          hl.exec_cmd("wl-paste --type image --watch cliphist store") -- Stores only image data
-          hl.exec_cmd("gnome-keyring-daemon --start --components=secrets")
-          hl.exec_cmd("fcitx5 -d")
-          hl.exec_cmd("sway-audio-idle-inhibit")
-      end)
+      -- Autostart: nothing here. Session daemons are systemd user services
+      -- bound to graphical-session.target (started by UWSM): waybar, cliphist
+      -- and sway-audio-idle-inhibit via Home Manager; fcitx5 via its XDG
+      -- autostart entry; gnome-keyring via the greetd PAM module.
 
       -- Environment
       hl.env("XCURSOR_SIZE", "24")
@@ -109,6 +104,7 @@
       hl.bind(mainMod .. " + N",      hl.dsp.exec_cmd(terminal))
       hl.bind(mainMod .. " + delete", hl.dsp.window.close())
       hl.bind(mainMod .. " + L",      hl.dsp.exec_cmd("pidof hyprlock || hyprlock -q"))
+      hl.bind(mainMod .. " + SHIFT + L", hl.dsp.exec_cmd("uwsm stop")) -- log out
       hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(terminal .. " " .. fileManager))
       hl.bind(mainMod .. " + F",      hl.dsp.window.float({ action = "toggle" }))
       hl.bind(mainMod .. " + P",      hl.dsp.window.pseudo())
@@ -147,6 +143,26 @@
           suppress_event = "maximize",
       })
     '';
+  };
+
+  # Clipboard history: one wl-paste watcher for text, one for images.
+  services.cliphist = {
+    enable = true;
+    allowImages = true;
+  };
+
+  # Block idle (hypridle/hyprlock) while audio is playing.
+  systemd.user.services.sway-audio-idle-inhibit = {
+    Unit = {
+      Description = "Inhibit idle while audio is playing";
+      PartOf = [ config.wayland.systemd.target ];
+      After = [ config.wayland.systemd.target ];
+    };
+    Service = {
+      ExecStart = lib.getExe pkgs.sway-audio-idle-inhibit;
+      Restart = "on-failure";
+    };
+    Install.WantedBy = [ config.wayland.systemd.target ];
   };
 
   programs.hyprlock = {

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   environment.variables = {
     XDG_SESSION_TYPE = "wayland";
@@ -39,5 +39,12 @@
     withUWSM = true;
     xwayland.enable = true;
   };
+
+  # Always start the UWSM-managed session: the plain "Hyprland" session never
+  # reaches graphical-session.target, so waybar, cliphist, hypridle, fcitx5 &
+  # co. would not start. No session picker, just log in.
+  services.greetd.settings.default_session.command =
+    "${pkgs.tuigreet}/bin/tuigreet --time --remember"
+    + " --cmd '${config.programs.uwsm.package}/bin/uwsm start -e -D Hyprland hyprland.desktop'";
 }
 

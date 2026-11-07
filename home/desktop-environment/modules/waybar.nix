@@ -6,6 +6,7 @@
 
   programs.waybar = {
     enable = true;
+    systemd.enable = true; # started with graphical-session.target (UWSM)
     settings = {
       mainBar = {
         height = 24;

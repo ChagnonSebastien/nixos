@@ -1,9 +1,10 @@
-{ pkgs, ...}: {
+{ pkgs, lib, ...}: {
   services.greetd = {
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions /run/current-system/sw/share/wayland-sessions";
+        # mkDefault: a desktop module may pin a single session instead.
+        command = lib.mkDefault "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-session --sessions /run/current-system/sw/share/wayland-sessions";
         user = "greeter";
       };
     };
