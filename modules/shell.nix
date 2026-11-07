@@ -10,7 +10,7 @@
   fonts.packages = with pkgs; [
     ubuntu-classic
     liberation_ttf
-    vazirmatn
+    (pkgs.vazirmatn or pkgs.vazir-fonts) # renamed in unstable; drop fallback once stable has vazirmatn
     font-awesome
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif

@@ -12,7 +12,7 @@
     mpv
     wl-clipboard # Clipboard CLI
     cliphist # Clipboard history
-    jetbrains.idea-ultimate
+    jetbrains.idea
 
     corretto21
     nodejs
