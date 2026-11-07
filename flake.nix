@@ -36,10 +36,13 @@
       };
 
       # A NixOS host with home-manager (and nixvim) wired up for user seb.
-      mkHost = { channel, modules, home }:
+      # The attribute name doubles as the hostname, so a bare
+      # `nixos-rebuild switch --flake .` always finds the right config.
+      mkHost = name: { channel, modules, home }:
         channel.nixpkgs.lib.nixosSystem {
           inherit system;
           modules = modules ++ [
+            { networking.hostName = name; }
             channel.home-manager.nixosModules.home-manager
             {
               home-manager = {
@@ -52,23 +55,23 @@
           ];
         };
     in {
-      nixosConfigurations = {
-        DesktopL = mkHost {
+      nixosConfigurations = builtins.mapAttrs mkHost {
+        desktopl = {
           channel = unstable;
           modules = [ ./desktop.nix ./hardware-configuration/desktop.nix ];
           home    = ./home/desktop.nix;
         };
-        Homelab = mkHost {
+        homelab = {
           channel = stable;
           modules = [ ./server.nix ./hardware-configuration/server.nix ];
           home    = ./home/server.nix;
         };
-        Work = mkHost {
+        work = {
           channel = stable;
           modules = [ ./work.nix ./hardware-configuration/work.nix ];
           home    = ./home/work.nix;
         };
-        WSL = mkHost {
+        wsl = {
           channel = stable;
           modules = [ nixos-wsl.nixosModules.default ./wsl.nix ];
           home    = ./home/wsl.nix;

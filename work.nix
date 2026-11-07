@@ -29,7 +29,6 @@
     options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
   '';
 
-  networking.hostName = "Work"; # Define your hostname.
   networking.networkmanager.enable = true;
 
   environment.sessionVariables = {

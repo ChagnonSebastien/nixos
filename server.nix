@@ -20,7 +20,6 @@
     libnvidia-container
   ];
 
-  networking.hostName = "homelab";
   networking.firewall.enable = false;
 
   networking.networkmanager.enable = false;

@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  # Cloud / k8s / Go tooling shared by the work machines (Work, WSL).
+  # Cloud / k8s / Go tooling shared by the work machines (work, wsl).
   home.packages = with pkgs; [
     awscli2
     kubectl
