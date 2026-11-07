@@ -35,25 +35,21 @@
   ];
 
   programs = {
+    # Required because zsh is the default login shell (generic.nix).
+    # Everything else (plugins, prompt, completion, fzf) lives in
+    # home/modules/shell.nix; compinit runs there, so skip it here.
     zsh = {
       enable = true;
-      ohMyZsh = {
-        enable = true;
-        theme = "robbyrussell";
-        plugins = [ "git" "fzf" ]; 
-      };
-      histSize = 5000;
-      autosuggestions.enable = true;
-      syntaxHighlighting.enable = true;
+      enableCompletion = false;
+      promptInit = ""; # oh-my-posh (home-manager) owns the prompt
     };
     git.enable = true;
     vim.enable = true;
     neovim.enable = true;
-    fzf = {
-      fuzzyCompletion = true;
-      keybindings = true;
-    };
   };
+
+  # Lets home-manager's zsh complete commands from system packages.
+  environment.pathsToLink = [ "/share/zsh" ];
 
 }
 

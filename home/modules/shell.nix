@@ -1,4 +1,4 @@
-{ pkgs, ...}: {
+{ pkgs, lib, options, ...}: {
 
   home.packages = with pkgs; [
     bat
@@ -240,7 +240,6 @@
         "zsh-users/zsh-completions"
         "zsh-users/zsh-autosuggestions"
         "chisui/zsh-nix-shell"
-        "agkozak/zsh-z"
         "getantidote/use-omz"
         "ohmyzsh/ohmyzsh path:lib"
         "ohmyzsh/ohmyzsh path:plugins/git"
@@ -274,5 +273,9 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+  } // lib.optionalAttrs (options.programs.fzf ? historyWidget) {
+    # atuin owns Ctrl-R. Option only exists in unstable home-manager;
+    # on stable, atuin already wins and there is no warning.
+    historyWidget.command = "";
   };
 }
