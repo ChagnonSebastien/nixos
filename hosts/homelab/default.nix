@@ -5,10 +5,11 @@
 { config, lib, pkgs, ... }:
 {
   imports = [
-    ./generic.nix
-    ./modules/boot-grub.nix
-    ./modules/shell.nix
-    ./modules/nvidia-gpu.nix
+    ./hardware.nix
+    ../../modules/common.nix
+    ../../modules/boot-grub.nix
+    ../../modules/shell.nix
+    ../../modules/nvidia-gpu.nix
   ];
 
   boot.kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = "80";

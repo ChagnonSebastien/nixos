@@ -1,8 +1,8 @@
 { ... }:
 {
   imports = [
-    ./generic.nix
-    ./modules/shell.nix
+    ../../modules/common.nix
+    ../../modules/shell.nix
   ];
 
   wsl.enable = true;

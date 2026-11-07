@@ -1,13 +1,14 @@
 { pkgs, config, lib, ... }:
 {
   imports = [
-    ./generic.nix
-    ./modules/boot-grub.nix
-    ./modules/nvidia-gpu.nix
-    ./modules/shell.nix
-    ./modules/docker-rootless.nix
-    ./desktop-environment/shared.nix
-    ./desktop-environment/hyprland.nix
+    ./hardware.nix
+    ../../modules/common.nix
+    ../../modules/boot-grub.nix
+    ../../modules/nvidia-gpu.nix
+    ../../modules/shell.nix
+    ../../modules/docker-rootless.nix
+    ../../modules/desktop-environment/shared.nix
+    ../../modules/desktop-environment/hyprland.nix
   ];
 
   networking = {

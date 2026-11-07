@@ -6,13 +6,14 @@
 
 {
   imports = [
-    ./generic.nix
-    ./modules/boot-grub.nix
-    ./modules/shell.nix
-    ./modules/nvidia-gpu.nix
-    ./modules/docker-rootless.nix
-    ./desktop-environment/shared.nix
-    ./desktop-environment/plasma.nix
+    ./hardware.nix
+    ../../modules/common.nix
+    ../../modules/boot-grub.nix
+    ../../modules/shell.nix
+    ../../modules/nvidia-gpu.nix
+    ../../modules/docker-rootless.nix
+    ../../modules/desktop-environment/shared.nix
+    ../../modules/desktop-environment/plasma.nix
   ];
 
   boot.extraModulePackages = with config.boot.kernelPackages; [

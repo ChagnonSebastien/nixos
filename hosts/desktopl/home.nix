@@ -1,9 +1,9 @@
 { pkgs, ...}: {
 
   imports = [
-    ./modules/shell.nix
-    ./modules/desktop-apps.nix
-    ./desktop-environment/hyprland.nix
+    ../../home/modules/shell.nix
+    ../../home/modules/desktop-apps.nix
+    ../../home/desktop-environment/hyprland.nix
   ];
 
   home.packages = with pkgs; [

@@ -38,10 +38,13 @@
       # A NixOS host with home-manager (and nixvim) wired up for user seb.
       # The attribute name doubles as the hostname, so a bare
       # `nixos-rebuild switch --flake .` always finds the right config.
-      mkHost = name: { channel, modules, home }:
+      # Config lives in hosts/<name>/: default.nix (system, imports its
+      # hardware.nix) and home.nix (home-manager for seb).
+      mkHost = name: { channel, extraModules ? [ ] }:
         channel.nixpkgs.lib.nixosSystem {
           inherit system;
-          modules = modules ++ [
+          modules = extraModules ++ [
+            ./hosts/${name}
             { networking.hostName = name; }
             channel.home-manager.nixosModules.home-manager
             {
@@ -49,32 +52,19 @@
                 useGlobalPkgs   = true;
                 useUserPackages = true;
                 sharedModules   = [ channel.nixvim.homeModules.nixvim ];
-                users.seb       = home;
+                users.seb       = ./hosts/${name}/home.nix;
               };
             }
           ];
         };
     in {
       nixosConfigurations = builtins.mapAttrs mkHost {
-        desktopl = {
-          channel = unstable;
-          modules = [ ./desktop.nix ./hardware-configuration/desktop.nix ];
-          home    = ./home/desktop.nix;
-        };
-        homelab = {
-          channel = stable;
-          modules = [ ./server.nix ./hardware-configuration/server.nix ];
-          home    = ./home/server.nix;
-        };
-        work = {
-          channel = stable;
-          modules = [ ./work.nix ./hardware-configuration/work.nix ];
-          home    = ./home/work.nix;
-        };
+        desktopl.channel = unstable;
+        homelab.channel  = stable;
+        work.channel     = stable;
         wsl = {
-          channel = stable;
-          modules = [ nixos-wsl.nixosModules.default ./wsl.nix ];
-          home    = ./home/wsl.nix;
+          channel      = stable;
+          extraModules = [ nixos-wsl.nixosModules.default ];
         };
       };
     };

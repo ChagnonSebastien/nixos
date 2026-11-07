@@ -1,10 +1,10 @@
 { pkgs, ...}: {
 
   imports = [
-    ./modules/shell.nix
-    ./modules/desktop-apps.nix
-    ./modules/devtools.nix
-    ./desktop-environment/plasma.nix
+    ../../home/modules/shell.nix
+    ../../home/modules/desktop-apps.nix
+    ../../home/modules/devtools.nix
+    ../../home/desktop-environment/plasma.nix
   ];
 
   home.packages = with pkgs; [
