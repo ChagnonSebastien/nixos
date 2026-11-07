@@ -1,11 +1,5 @@
 { config, pkgs, ... }:
 {
-  environment.variables = {
-    XDG_SESSION_TYPE = "wayland";
-    XDG_RUNTIME_DIR = "/run/user/$(id -u)";
-    WLR_NO_HARDWARE_CURSORS = "1";
-  };
-
   services.xserver.xkb.layout = "ca";
   services.xserver.xkb.variant = "fr";
 

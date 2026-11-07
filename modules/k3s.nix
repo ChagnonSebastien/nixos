@@ -8,7 +8,6 @@ let
 in
 {
   environment.systemPackages = with pkgs; [
-    nvidia-docker
     runc
     openiscsi
     nvidia-container-toolkit
@@ -66,7 +65,6 @@ in
     containerd
     runc
     nvidia-container-toolkit
-    nvidia-docker
     libnvidia-container
     flannel
   ];

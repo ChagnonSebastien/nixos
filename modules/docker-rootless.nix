@@ -1,6 +1,6 @@
 {
+  # Rootless docker daemon for seb (rootful docker stays off).
   virtualisation.docker = {
-    enable = false;
     rootless = {
       enable = true;
       setSocketVariable = true;

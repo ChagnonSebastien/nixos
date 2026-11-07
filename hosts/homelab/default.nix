@@ -20,7 +20,6 @@
   boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
 
   environment.systemPackages = with pkgs; [
-    nvidia-docker
     nvidia-container-toolkit
     libnvidia-container
   ];
