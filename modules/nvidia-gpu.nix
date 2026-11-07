@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   hardware.graphics.enable = true;
@@ -9,7 +9,8 @@
     powerManagement.enable = true;
     forceFullCompositionPipeline = true;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # mkDefault: hosts with older GPUs pick a legacy driver branch.
+    package = lib.mkDefault config.boot.kernelPackages.nvidiaPackages.stable;
     open = false;
   };
 

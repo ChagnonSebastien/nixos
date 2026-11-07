@@ -19,11 +19,6 @@
   boot.kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = "80";
   boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
 
-  environment.systemPackages = with pkgs; [
-    nvidia-container-toolkit
-    libnvidia-container
-  ];
-
   networking.firewall.enable = false;
 
   networking.networkmanager.enable = false;
