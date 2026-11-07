@@ -2,6 +2,7 @@
 {
   imports = [
     ./hardware.nix
+    ./vpn.nix
     ../../modules/user.nix
     ../../modules/kvm.nix
     ../../modules/boot-grub.nix
