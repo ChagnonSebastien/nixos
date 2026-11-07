@@ -4,6 +4,7 @@
     ./modules/hyprland.nix
     ./modules/hyprpaper.nix
     ./modules/waybar.nix
+    ./modules/swaync.nix
   ];
 
   home.packages = with pkgs; [

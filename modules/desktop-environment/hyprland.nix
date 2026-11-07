@@ -23,7 +23,6 @@
   environment.systemPackages = with pkgs; [
     seatd
     pavucontrol
-    swaynotificationcenter # Notification daemon
     sway-audio-idle-inhibit
     playerctl
   ];
