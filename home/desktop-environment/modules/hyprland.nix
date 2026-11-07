@@ -190,7 +190,32 @@
     Install.WantedBy = [ config.wayland.systemd.target ];
   };
 
-  programs.hyprlock = {
+  programs.hyprlock = let
+    font = "FiraCode Nerd Font Propo";
+    mocha = {
+      base = "rgb(1e1e2e)";
+      mantle = "rgba(181825cc)";
+      surface0 = "rgb(313244)";
+      text = "rgb(cdd6f4)";
+      subtext0 = "rgb(a6adc8)";
+      overlay1 = "rgb(7f849c)";
+      mauve = "rgb(cba6f7)";
+      red = "rgb(f38ba8)";
+      peach = "rgb(fab387)";
+      yellow = "rgb(f9e2af)";
+    };
+    powerButton = icon: cmd: x: {
+      monitor = "";
+      text = icon;
+      color = mocha.overlay1;
+      font_size = 22;
+      font_family = font;
+      onclick = cmd;
+      position = "${toString x}, 40";
+      halign = "right";
+      valign = "bottom";
+    };
+  in {
     enable = true;
     settings = {
       general = {
@@ -199,111 +224,88 @@
         grace = 1;
       };
 
-      background = [
+      background = map (w: {
+        inherit (w) monitor path;
+        color = mocha.base;
+        blur_passes = 3;
+        blur_size = 6;
+        brightness = 0.6;
+        vibrancy = 0.17;
+      }) config.services.hyprpaper.settings.wallpaper;
+
+      shape = [
         {
           monitor = "";
-          blur_passes = 2;
-          contrast = 0.8916;
-          brightness = 0.8172;
-          vibrancy = 0.1696;
-          vibrancy_darkness = 0.0;
+          size = "420, 440";
+          color = mocha.mantle;
+          rounding = 16;
+          border_size = 1;
+          border_color = mocha.surface0;
+          position = "0, 40";
+          halign = "center";
+          valign = "center";
         }
       ];
 
       label = [
         {
           monitor = "";
-          text = "cmd[update:1000] echo -e \"$(date +\"%A\")\"";
-          color = "rgba(216, 222, 233, 0.70)";
-          font_size = 90;
-          font_family = "SF Pro Display Bold";
-          position = "0, 350";
+          text = "$TIME";
+          color = mocha.text;
+          font_size = 96;
+          font_family = "${font} Bold";
+          position = "0, 150";
           halign = "center";
           valign = "center";
         }
         {
           monitor = "";
-          text = "cmd[update:1000] echo -e \"$(date +\"%d %B\")\"";
-          color = "rgba(216, 222, 233, 0.70)";
-          font_size = 40;
-          font_family = "SF Pro Display Bold";
-          position = "0, 250";
-          halign = "center";
-          valign = "center";
-        }
-        {
-          monitor = "";
-          text = "cmd[update:1000] echo -e \"<span>$(date +\"- %I:%M -\")</span>\"";
-          color = "rgba(216, 222, 233, 0.70)";
+          text = "cmd[update:60000] date +'%A %-d %B'";
+          color = mocha.mauve;
           font_size = 20;
-          font_family = "SF Pro Display Bold";
-          position = "0, 190";
+          font_family = font;
+          position = "0, 60";
           halign = "center";
           valign = "center";
         }
         {
           monitor = "";
-          text = "    $USER";
-          color = "rgba(216, 222, 233, 0.70)";
-          font_size = 18;
-          font_family = "SF Pro Display Bold";
-          position = "0, -130";
+          text = "  $USER";
+          color = mocha.subtext0;
+          font_size = 14;
+          font_family = font;
+          position = "0, -10";
           halign = "center";
           valign = "center";
         }
-        {
-          monitor = "";
-          text = " 󰜉 ";
-          color = "rgba(255, 255, 255, 0.6)";
-          font_size = 50;
-          onclick = "reboot now";
-          position = "0, 100";
-          halign = "center";
-          valign = "bottom";
-          font_family = "FiraCode Nerd Font";
-        }
-        {
-          monitor = "";
-          text = " 󰐥 ";
-          color = "rgba(255, 255, 255, 0.6)";
-          font_size = 50;
-          onclick = "shutdown now";
-          position = "820, 100";
-          halign = "left"; 
-          valign = "bottom";
-          font_family = "FiraCode Nerd Font";
-        }
-        {
-          monitor = "";
-          text = " 󰤄 ";
-          color = "rgba(255, 255, 255, 0.6)";
-          font_size = 50;
-          onclick = "systemctl suspend";
-          position = "-820, 100";
-          halign = "right";
-          valign = "bottom";
-          font_family = "FiraCode Nerd Font";
-        }
+        (powerButton "󰤄" "systemctl suspend" (-140))
+        (powerButton "󰜉" "systemctl reboot" (-90))
+        (powerButton "󰐥" "systemctl poweroff" (-40))
       ];
 
       input-field = [
         {
           monitor = "";
-          size = "300, 60";
+          size = "300, 50";
           outline_thickness = 2;
-          dots_size = 0.2;
-          dots_spacing = 0.2;
-          outer_color = "rgba(255, 255, 255, 0)";
-          inner_color = "rgba(255, 255, 255, 0.1)";
-          font_color = "rgb(200, 200, 200)";
-          halign = "center";
-          valign = "center";
-          font_family = "SF Pro Display Bold";
-          position = "0, -210";
+          rounding = 10;
+          dots_size = 0.25;
+          dots_spacing = 0.3;
           dots_center = true;
+          outer_color = mocha.mauve;
+          inner_color = mocha.surface0;
+          font_color = mocha.text;
+          check_color = mocha.yellow;
+          fail_color = mocha.red;
+          capslock_color = mocha.peach;
+          font_family = font;
           fade_on_empty = false;
           hide_input = false;
-          placeholder_text = "<i><span foreground=\"##ffffff99\">🔒 Enter Pass</span></i>";
+          placeholder_text = "<span foreground=\"##a6adc8\">Password</span>";
+          fail_text = "$FAIL ($ATTEMPTS)";
+          position = "0, -90";
+          halign = "center";
+          valign = "center";
         }
       ];
     };
