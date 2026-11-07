@@ -8,6 +8,14 @@
     gtk.enable = true;
   };
 
+  gtk = {
+    enable = true;
+    iconTheme = {
+      package = pkgs.papirus-icon-theme;
+      name = "Papirus-Dark";
+    };
+  };
+
   wayland.windowManager.hyprland = {
     enable = true;
     # UWSM (programs.hyprland.withUWSM) owns the systemd session targets. HM's
