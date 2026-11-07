@@ -1,8 +1,4 @@
-# Edit this configuration file to define what should be installed on
-# your system. Help is available in the configuration.nix(5) man page, on
-# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
-
-{ config, lib, pkgs, ... }:
+{ ... }:
 {
   imports = [
     ./hardware.nix
@@ -25,8 +21,8 @@
 
     ipv4.addresses = [
       {
-        address = "192.168.0.2";  # Replace with your desired static IP
-        prefixLength = 24;        # Typically 24 for a 255.255.255.0 netmask
+        address = "192.168.0.2";
+        prefixLength = 24;
       }
     ];
   };
@@ -59,7 +55,7 @@
     '';
   };
 
-  networking.nameservers = [ "192.168.0.2" ];  # Replace with your preferred DNS servers
+  networking.nameservers = [ "192.168.0.2" ];
 
   virtualisation.docker = {
     enable = true;
@@ -75,8 +71,6 @@
       dates = "weekly";
       flags = [ "--all" "--filter" "until=168h" ];
     };
-
-    #extraOptions = "--default-runtime=nvidia";
   };
 
   systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/hdd-1" ];
@@ -90,7 +84,6 @@
 
   # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
   # and migrated your data accordingly.
-  system.stateVersion = "24.11"; # Did you read the comment?
-
+  system.stateVersion = "24.11";
 }
 

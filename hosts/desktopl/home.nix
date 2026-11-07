@@ -24,12 +24,7 @@
     jetbrains.idea
     prismlauncher
     obsidian
-    #libreoffice-qt6-still
     onlyoffice-desktopeditors
-    #chromium
-    #(writeShellScriptBin "google-chrome" ''
-    #  exec ${pkgs.chromium}/bin/chromium "$@"
-    #'')
   ];
 
   xdg.mimeApps.defaultApplications = {
@@ -53,8 +48,6 @@
     "video/mp2t" = "mpv.desktop";
     "video/webm" = "mpv.desktop";
   };
-
-  # services.owncloud-client.enable = true;
 
   # The state version is required and should stay at the version you
   # originally installed.
