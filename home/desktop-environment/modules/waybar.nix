@@ -45,10 +45,18 @@ let
       cpu_temp=$(( $(cat /sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input) / 1000 ))
       IFS=', ' read -r gpu_usage gpu_temp gpu_mem_used gpu_mem_total < <(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,memory.used,memory.total --format=csv,noheader,nounits)
 
-      class=""
-      if (( cpu_temp >= 80 || gpu_temp >= 80 )); then class="critical"; fi
+      disk_pcent() { df --output=pcent "$1" | tail -1 | tr -dc '0-9'; }
+      disks=$(df -h --output=target,used,size,pcent -x tmpfs -x devtmpfs -x efivarfs -x overlay -x squashfs \
+        | awk -v q="'" 'NR > 1 && $1 !~ /^\/(run|nix|proc|sys|dev)/ {
+            line = sprintf("%-15s %5s / %-5s %4s", $1, $2, $3, $4)
+            if ($4 + 0 >= 90) line = "<span color=" q "#f38ba8" q ">" line "</span>"
+            printf "\\n%s", line
+          }')
 
-      tooltip="<tt>CPU   $cpu%   $cpu_temp°C\nRAM   $mem_used / $mem_total GiB\nGPU   $gpu_usage%   $gpu_temp°C\nVRAM  $(( gpu_mem_used / 1024 )) / $(( gpu_mem_total / 1024 )) GiB</tt>"
+      class=""
+      if (( cpu_temp >= 80 || gpu_temp >= 80 || $(disk_pcent /) >= 90 || $(disk_pcent /boot) >= 90 )); then class="critical"; fi
+
+      tooltip="<tt>CPU   $cpu%   $cpu_temp°C\nRAM   $mem_used / $mem_total GiB\nGPU   $gpu_usage%   $gpu_temp°C\nVRAM  $(( gpu_mem_used / 1024 )) / $(( gpu_mem_total / 1024 )) GiB\n$disks</tt>"
       printf '{"text": "%s", "tooltip": "%s", "class": "%s"}\n' "󰍛" "$tooltip" "$class"
     '';
   });
