@@ -1,0 +1,26 @@
+# Work laptop allow list (assign to Work group)
+# Keeps Google Workspace working: Meet, Calendar, Gmail, Google SSO
+# Last updated: 2026-10-31
+
+# Google APIs (OAuth token/userinfo for Sign in with Google, Workspace APIs)
+www.googleapis.com
+
+# Contacts / people chips and autocomplete in Gmail, Calendar, Meet
+people-pa.googleapis.com
+
+# Google Chat panel in Gmail
+chat.google.com
+
+# Calendar and Gmail notifications
+notifications-pa.googleapis.com
+calendarpushsubscription-pa.googleapis.com
+
+# Profile photos in Gmail, Calendar, Meet
+lh3.googleusercontent.com
+
+# YouTube thumbnails
+i.ytimg.com
+
+# Public IP lookup
+api.ipify.org
+api.seeip.org

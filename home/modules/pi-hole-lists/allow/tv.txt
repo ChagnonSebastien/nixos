@@ -1,0 +1,7 @@
+# TCL Google TV allow list (assign to TV group)
+# Keeps Tou.tv DRM, Jellyfin, and Play Store updates working
+# Last updated: 2026-10-31
+
+# Widevine provisioning, Play Store
+www.googleapis.com
+playatoms-pa.googleapis.com

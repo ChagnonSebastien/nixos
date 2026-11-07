@@ -1,0 +1,23 @@
+# Desktop allow list (assign to Desktop group)
+# Keeps Gmail, Calendar, Drive, Meet and Sign in with Google working
+# Last updated: 2026-10-31
+
+# Google APIs: OAuth token/userinfo for Google SSO, plus the
+# Gmail/Calendar/Drive REST endpoints the web apps call
+www.googleapis.com
+
+# Contacts / people chips and autocomplete in Gmail, Calendar, Drive sharing
+people-pa.googleapis.com
+
+# Google Chat panel in Gmail
+chat.google.com
+
+# Calendar and Gmail notifications
+notifications-pa.googleapis.com
+calendarpushsubscription-pa.googleapis.com
+
+# Profile photos in Gmail, Calendar, Drive, Meet
+lh3.googleusercontent.com
+
+# YouTube thumbnails
+i.ytimg.com
