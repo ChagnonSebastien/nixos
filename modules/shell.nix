@@ -10,7 +10,7 @@
   fonts.packages = with pkgs; [
     ubuntu-classic
     liberation_ttf
-    vazir-fonts
+    vazirmatn
     font-awesome
     noto-fonts-cjk-sans
     noto-fonts-cjk-serif

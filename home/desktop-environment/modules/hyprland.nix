@@ -2,164 +2,151 @@
 
   wayland.windowManager.hyprland = {
     enable = true;
-    systemd.enable = true;
+    # UWSM (programs.hyprland.withUWSM) owns the systemd session targets. HM's
+    # integration restarts hyprland-session.target on startup, which tears down
+    # UWSM's graphical-session.target and makes Hyprland exit immediately.
+    systemd.enable = false;
 
-    settings = {
-      monitor = [
-        "DP-2, 2560x1440@170, 0x0, 1"
-        "DP-3, 2560x1440@170, 2560x0, 1"
-      ];
+    # Hyprland >= 0.57 only reads hyprland.lua; hyprlang (hyprland.conf) is gone.
+    # Written as plain Lua rather than `settings`, because Home Manager renders
+    # `settings` calls alphabetically (hl.animation would precede hl.curve).
+    configType = "lua";
 
-      exec-once = [
-        "waybar"
-        "wl-paste --type text --watch cliphist store" # Stores only text data
-        "wl-paste --type image --watch cliphist store" # Stores only image data
-        "gnome-keyring-daemon --start --components=secrets"
-        "fcitx5 -d"
-        "sway-audio-idle-inhibit"
-      ];
+    extraConfig = ''
+      -- Monitors
+      hl.monitor({ output = "DP-2", mode = "2560x1440@170", position = "0x0",    scale = 1 })
+      hl.monitor({ output = "DP-3", mode = "2560x1440@170", position = "2560x0", scale = 1 })
 
-      env = [
-        "XCURSOR_SIZE,24"
-        "HYPRCURSOR_SIZE,24"
-        "LIBVA_DRIVER_NAME,nvidia"
-        "XDG_SESSION_TYPE,wayland"
-        "GBM_BACKEND,nvidia-drm"
-        "__GLX_VENDOR_LIBRARY_NAME,nvidia"
-        "WLR_NO_HARDWARE_CURSORS,true"
-      ];
+      -- Programs
+      local terminal    = "kitty"
+      local fileManager = "superfile"
+      local menu        = "rofi -show run"
+      local launcher    = "rofi -show drun"
+      local mainMod     = "SUPER"
 
-      general = { 
-        gaps_in = 5;
-        gaps_out = 20;
-        border_size = 2;
-        "col.active_border" = "rgba(ff9900ee) rgba(ffbf00ee) 45deg";
-        "col.inactive_border" = "rgba(595959aa)";
-        resize_on_border = false;
-        allow_tearing = false;
-        layout = "dwindle";
-      };
+      -- Autostart
+      hl.on("hyprland.start", function()
+          hl.exec_cmd("waybar")
+          hl.exec_cmd("wl-paste --type text --watch cliphist store")  -- Stores only text data
+          hl.exec_cmd("wl-paste --type image --watch cliphist store") -- Stores only image data
+          hl.exec_cmd("gnome-keyring-daemon --start --components=secrets")
+          hl.exec_cmd("fcitx5 -d")
+          hl.exec_cmd("sway-audio-idle-inhibit")
+      end)
 
-      decoration = {
-          rounding = 10;
-          active_opacity = 1.0;
-          inactive_opacity = 1.0;
-          shadow = {
-              enabled = true;
-              range = 4;
-              render_power = 3;
-              color = "rgba(1a1a1aee)";
-          };
-          blur = {
-              enabled = true;
-              size = 3;
-              passes = 1;
-              vibrancy = 0.1696;
-          };
-      };
+      -- Environment
+      hl.env("XCURSOR_SIZE", "24")
+      hl.env("HYPRCURSOR_SIZE", "24")
+      hl.env("LIBVA_DRIVER_NAME", "nvidia")
+      hl.env("XDG_SESSION_TYPE", "wayland")
+      hl.env("GBM_BACKEND", "nvidia-drm")
+      hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+      hl.env("WLR_NO_HARDWARE_CURSORS", "true")
 
-      animations = {
-        enabled = true;
-        bezier = "myBezier, 0.05, 0.9, 0.1, 1.01";
-        animation = [
-          "windows, 1, 4, myBezier"
-          "windowsOut, 1, 4, default, popin 80%"
-          "border, 1, 6, default"
-          "borderangle, 1, 5, default"
-          "fade, 1, 4, default"
-          "workspaces, 1, 3, default"
-        ];
-      };
+      -- Look and feel
+      hl.config({
+          general = {
+              gaps_in     = 5,
+              gaps_out    = 20,
+              border_size = 2,
+              col = {
+                  active_border   = { colors = { "rgba(ff9900ee)", "rgba(ffbf00ee)" }, angle = 45 },
+                  inactive_border = "rgba(595959aa)",
+              },
+              resize_on_border = false,
+              allow_tearing    = false,
+              layout           = "dwindle",
+          },
 
-      dwindle = {
-        preserve_split = true;
-      };
+          decoration = {
+              rounding         = 10,
+              active_opacity   = 1.0,
+              inactive_opacity = 1.0,
+              shadow = {
+                  enabled      = true,
+                  range        = 4,
+                  render_power = 3,
+                  color        = 0xee1a1a1a,
+              },
+              blur = {
+                  enabled  = true,
+                  size     = 3,
+                  passes   = 1,
+                  vibrancy = 0.1696,
+              },
+          },
 
-      master = {
-        new_status = "master";
-      };
+          animations = { enabled = true },
+          dwindle    = { preserve_split = true },
+          master     = { new_status = "master" },
 
-      misc = { 
-        force_default_wallpaper = -1;
-        disable_hyprland_logo = false;
-      };
+          misc = {
+              force_default_wallpaper = -1,
+              disable_hyprland_logo   = false,
+          },
 
-      input = {
-        kb_layout = "ca";
-        kb_variant = "fr";
-        follow_mouse = 1;
-        sensitivity = 0; # -1.0 - 1.0, 0 means no modification.
-      };
+          input = {
+              kb_layout    = "ca",
+              kb_variant   = "fr",
+              follow_mouse = 1,
+              sensitivity  = 0, -- -1.0 - 1.0, 0 means no modification.
+          },
+      })
 
-      "$terminal" = "kitty";
-      "$fileManager" = "superfile";
-      "$menu" = "rofi -show run";
-      "$launcher" = "rofi -show drun";
-      "$mainMod" = "SUPER";
+      -- Animations
+      hl.curve("myBezier", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.01 } } })
 
-      bind = [
-        "$mainMod, N, exec, $terminal"
-        "$mainMod, delete, killactive,"
-        "$mainMod, L, exec, pidof hyprlock || hyprlock -q"
-        "$mainMod, E, exec, $terminal $fileManager"
-        "$mainMod, F, togglefloating,"
-        "$mainMod, P, pseudo,"
-        "$mainMod, J, layoutmsg, togglesplit"
-        "$mainMod, 112, fullscreen,"
-        "$mainMod, space, exec, $menu"
-        "ALT, space, exec, $launcher"
+      hl.animation({ leaf = "windows",     enabled = true, speed = 4, bezier = "myBezier" })
+      hl.animation({ leaf = "windowsOut",  enabled = true, speed = 4, bezier = "default", style = "popin 80%" })
+      hl.animation({ leaf = "border",      enabled = true, speed = 6, bezier = "default" })
+      hl.animation({ leaf = "borderangle", enabled = true, speed = 5, bezier = "default" })
+      hl.animation({ leaf = "fade",        enabled = true, speed = 4, bezier = "default" })
+      hl.animation({ leaf = "workspaces",  enabled = true, speed = 3, bezier = "default" })
 
-        "$mainMod SHIFT, S, exec, grim -g \"$(slurp -d -w 0)\" -t png - | satty --filename - --copy-command wl-copy --output-filename ~/Pictures/Captures/$(date '+%Y-%m-%d_%H-%M-%S').png"
-        "$mainMod, S, exec, grim -g \"$(slurp -o -r -w 0)\" -t png - | satty --filename - --fullscreen --copy-command wl-copy --output-filename ~/Pictures/Captures/$(date '+%Y-%m-%d_%H-%M-%S').png"
-        "$mainMod, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
+      -- Keybindings
+      local screenshotOut = "~/Pictures/Captures/$(date '+%Y-%m-%d_%H-%M-%S').png"
 
-        "$mainMod, left, movefocus, l"
-        "$mainMod, right, movefocus, r"
-        "$mainMod, up, movefocus, u"
-        "$mainMod, down, movefocus, d"
+      hl.bind(mainMod .. " + N",      hl.dsp.exec_cmd(terminal))
+      hl.bind(mainMod .. " + delete", hl.dsp.window.close())
+      hl.bind(mainMod .. " + L",      hl.dsp.exec_cmd("pidof hyprlock || hyprlock -q"))
+      hl.bind(mainMod .. " + E",      hl.dsp.exec_cmd(terminal .. " " .. fileManager))
+      hl.bind(mainMod .. " + F",      hl.dsp.window.float({ action = "toggle" }))
+      hl.bind(mainMod .. " + P",      hl.dsp.window.pseudo())
+      hl.bind(mainMod .. " + J",      hl.dsp.layout("togglesplit"))
+      hl.bind(mainMod .. " + code:112", hl.dsp.window.fullscreen())
+      hl.bind(mainMod .. " + space",  hl.dsp.exec_cmd(menu))
+      hl.bind("ALT + space",          hl.dsp.exec_cmd(launcher))
 
-        "$mainMod SHIFT, left, movewindow, l"
-        "$mainMod SHIFT, right, movewindow, r"
-        "$mainMod SHIFT, up, movewindow, u"
-        "$mainMod SHIFT, down, movewindow, d"
+      hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(
+          "grim -g \"$(slurp -d -w 0)\" -t png - | satty --filename - --copy-command wl-copy --output-filename " .. screenshotOut))
+      hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(
+          "grim -g \"$(slurp -o -r -w 0)\" -t png - | satty --filename - --fullscreen --copy-command wl-copy --output-filename " .. screenshotOut))
+      hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("cliphist list | rofi -dmenu | cliphist decode | wl-copy"))
 
-        "$mainMod, 1, workspace, 1"
-        "$mainMod, 2, workspace, 2"
-        "$mainMod, 3, workspace, 3"
-        "$mainMod, 4, workspace, 4"
-        "$mainMod, 5, workspace, 5"
-        "$mainMod, 6, workspace, 6"
-        "$mainMod, 7, workspace, 7"
-        "$mainMod, 8, workspace, 8"
-        "$mainMod, 9, workspace, 9"
-        "$mainMod, 0, workspace, 10"
+      for _, dir in ipairs({ "left", "right", "up", "down" }) do
+          hl.bind(mainMod .. " + " .. dir,             hl.dsp.focus({ direction = dir }))
+          hl.bind(mainMod .. " + SHIFT + " .. dir,     hl.dsp.window.move({ direction = dir }))
+      end
 
-        "$mainMod SHIFT, 1, movetoworkspace, 1"
-        "$mainMod SHIFT, 2, movetoworkspace, 2"
-        "$mainMod SHIFT, 3, movetoworkspace, 3"
-        "$mainMod SHIFT, 4, movetoworkspace, 4"
-        "$mainMod SHIFT, 5, movetoworkspace, 5"
-        "$mainMod SHIFT, 6, movetoworkspace, 6"
-        "$mainMod SHIFT, 7, movetoworkspace, 7"
-        "$mainMod SHIFT, 8, movetoworkspace, 8"
-        "$mainMod SHIFT, 9, movetoworkspace, 9"
-        "$mainMod SHIFT, 0, movetoworkspace, 10"
+      for i = 1, 10 do
+          local key = i % 10 -- 10 maps to key 0
+          hl.bind(mainMod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
+          hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+      end
 
-        "$mainMod, mouse_down, workspace, e+1"
-        "$mainMod, mouse_up, workspace, e-1"
-      ];
+      hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+      hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 
-      bindm = [
-        "$mainMod, mouse:272, movewindow"
-        "$mainMod, mouse:273, resizewindow"
-      ];
+      hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+      hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
-      windowrule = {
-        name = "suppress-maximize";
-        "match:class" = ".*";
-        suppress_event = "maximize";
-      };
-    };
+      -- Window rules
+      hl.window_rule({
+          name  = "suppress-maximize",
+          match = { class = ".*" },
+          suppress_event = "maximize",
+      })
+    '';
   };
 
   programs.hyprlock = {
