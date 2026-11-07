@@ -20,6 +20,8 @@ in
     tinyproxy
   ];
 
+  programs.git.settings.user.email = "sebastien.chagnon@qohash.com";
+
   # The state version is required and should stay at the version you
   # originally installed.
   home.stateVersion = "24.05";

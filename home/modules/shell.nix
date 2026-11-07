@@ -204,7 +204,8 @@
     settings = {
       user = {
         name = "Sebastien Chagnon";
-        email = "sebastien.chagnon@qohash.com";
+        # Personal address by default; work hosts override it.
+        email = lib.mkDefault "sebastien.chagnon@proton.me";
       };
       core.autocrlf = "input";
       push.default = "current";
