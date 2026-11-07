@@ -21,18 +21,10 @@
     };
   };
 
-  virtualisation.docker = {
-    enable = false;
-    rootless = {
-      enable = true;
-      setSocketVariable = true;
-    };
-  };
-
   users = {
     users.seb = {
       isNormalUser = true;
-      extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "docker" "vboxusers" ];
+      extraGroups = [ "wheel" "seat" "video" "input" "audio" "networkmanager" "vboxusers" ];
       initialPassword = "change-me";
     };
   };
@@ -42,15 +34,6 @@
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
     localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
-  };
-
-  environment.systemPackages = with pkgs; [
-  ];
-
-  environment.sessionVariables = {
-  };
-
-  environment.variables = {
   };
 
   # Override NVIDIA driver from nvidia-gpu.nix to use legacy_580 for this desktop's older GPU

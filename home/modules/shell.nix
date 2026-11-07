@@ -1,8 +1,9 @@
-{ pkgs, lib, options, ...}: {
+{ pkgs, lib, options, osConfig, ...}: {
 
   home.packages = with pkgs; [
     bat
-    (btop.override { cudaSupport = true; })
+    # GPU stats only on hosts running the NVIDIA driver (not WSL)
+    (btop.override { cudaSupport = builtins.elem "nvidia" osConfig.services.xserver.videoDrivers; })
     tlrc # tldr
     dust
 

@@ -39,7 +39,7 @@
   users.users.seb = {
     isNormalUser = true;
     description = "seb";
-    extraGroups = [ "networkmanager" "seat" "video" "input" "audio" "wheel" "docker" "vboxusers" ];
+    extraGroups = [ "networkmanager" "seat" "video" "input" "audio" "wheel" "vboxusers" ];
     packages = with pkgs; [
       kdePackages.kate
     ];
