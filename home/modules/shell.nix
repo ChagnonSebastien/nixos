@@ -137,22 +137,16 @@
       lsp = {
         enable = true;
         servers = {
-          clangd = {
-            enable = true;
-            autostart = true;
-          };
           nil_ls = {
             enable = true;
             autostart = true;
+            settings = {
+              autoArchive = true;
+            };
           };
-          gopls = {
-            enable = true;
-            autostart = true;
-          };
-          ts_ls = {
-            enable = true;
-            autostart = true;
-          };
+          clangd = { enable = true; autostart = true; };
+          gopls = { enable = true; autostart = true; };
+          ts_ls = { enable = true; autostart = true; };
         };
       };
       lualine.enable = true;
@@ -236,6 +230,7 @@
     '';
     initContent = ''
       precmd() { print "" }
+      logout() { loginctl terminate-user "$USER" }
     '';
     antidote = {
       enable = true;
@@ -271,6 +266,9 @@
   programs.atuin = {
     enable = true;
     enableZshIntegration = true;
+    settings = {
+      enter_accept = true;
+    };
   };
   
   programs.fzf = {

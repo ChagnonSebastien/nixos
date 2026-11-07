@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, lib, ... }:
 {
   imports = [
     ./generic.nix
@@ -48,6 +48,13 @@
     };
   };
 
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+  };
+
   environment.systemPackages = with pkgs; [
   ];
 
@@ -56,6 +63,9 @@
 
   environment.variables = {
   };
+
+  # Override NVIDIA driver from nvidia-gpu.nix to use legacy_580 for this desktop's older GPU
+  hardware.nvidia.package = lib.mkForce config.boot.kernelPackages.nvidiaPackages.legacy_580;
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.

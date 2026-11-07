@@ -15,8 +15,10 @@
   nixpkgs.config = {
     allowUnfree = true;
     permittedInsecurePackages = [
+      "openssl-1.1.1w"
       "beekeeper-studio-5.5.3"
       "gradle-7.6.6"
+      "electron-39.8.10"
     ];
   };
 

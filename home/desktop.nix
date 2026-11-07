@@ -9,9 +9,12 @@
     librewolf
 
     qview
+    (mpv.override {
+      yt-dlp = yt-dlp-light;
+    })
+
     vesktop
     youtube-music
-    mpv
     bitwarden-desktop
     bitwarden-cli
     jellyfin-media-player
@@ -30,8 +33,6 @@
       exec ${pkgs.beekeeper-studio}/bin/beekeeper-studio "$@"
     '')
     jetbrains.idea
-    wineWowPackages.waylandFull
-    winetricks
     prismlauncher
     obs-studio
     obsidian
@@ -41,6 +42,8 @@
     #(writeShellScriptBin "google-chrome" ''
     #  exec ${pkgs.chromium}/bin/chromium "$@"
     #'')
+
+    claude-code
   ];
 
   xdg.mimeApps = {
@@ -75,7 +78,7 @@
     };
   };
 
-  services.owncloud-client.enable = true;
+  # services.owncloud-client.enable = true;
 
   # The state version is required and should stay at the version you
   # originally installed.

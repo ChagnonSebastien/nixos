@@ -26,13 +26,15 @@
 
   fileSystems."/media/hdd" =
     { device = "/dev/disk/by-uuid/2C524FAB524F789A";
-      options = [ "defaults" ];
+      fsType = "ntfs3";
+      options = [ "defaults" "nofail" "uid=1000" "gid=100" "force" ];
     };
 
 
   fileSystems."/media/windows" =
     { device = "/dev/disk/by-uuid/7AA2EB72A2EB3175";
-      options = [ "defaults" ];
+      fsType = "ntfs3";
+      options = [ "defaults" "nofail" "uid=1000" "gid=100" "force" ];
     };
   swapDevices = [ ];
 
