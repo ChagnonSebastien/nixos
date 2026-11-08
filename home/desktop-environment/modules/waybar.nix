@@ -11,7 +11,7 @@ let
       case "''${1:-status}" in
         status)
           current=$(active)
-          echo "   ''${current:-direct}"
+          echo " ''${current:-direct}"
           ;;
         next)
           mapfile -t locations < <(nmcli -t -f NAME,TYPE connection show | awk -F: '$2 == "wireguard" { print $1 }' | sort)
@@ -80,16 +80,16 @@ in {
 
         "custom/notification" = {
           tooltip = false;
-          format = "{} {icon}";
+          format = "{icon} {text}";
           "format-icons" = {
             notification = "󱅫";
             none = "";
-            "dnd-notification" = " ";
+            "dnd-notification" = "";
             "dnd-none" = "󰂛";
-            "inhibited-notification" = " ";
+            "inhibited-notification" = "";
             "inhibited-none" = "";
-            "dnd-inhibited-notification" = " ";
-            "dnd-inhibited-none" = " ";
+            "dnd-inhibited-notification" = "";
+            "dnd-inhibited-none" = "";
           };
           "return-type" = "json";
           "exec-if" = "which swaync-client";
@@ -109,16 +109,16 @@ in {
         "hyprland/workspaces" = {
           disable-scroll = true;
           warp-on-scroll = false;
-          format = "{name}: {icon}";
+          format = "{name} {icon}";
           format-icons = {
-            "1" = " ";
-            "2" = " ";
-            "3" = " ";
-            "4" = " ";
-            "5" = " ";
-            urgent = " ";
-            active = " ";
-            default = " ";
+            "1" = "";
+            "2" = "";
+            "3" = "";
+            "4" = "";
+            "5" = "";
+            urgent = "";
+            active = "";
+            default = "";
           };
         };
         "keyboard-state" = {
@@ -126,7 +126,7 @@ in {
           capslock = true;
           format = "{icon}";
           format-icons = {
-            locked = "CAPS_LOCK 🔴";
+            locked = "󰘲 CAPS";
             unlocked = "";
           };
         };
@@ -134,11 +134,11 @@ in {
           format = "{player_icon} {dynamic}";
           format-paused = "{status_icon} <i>{dynamic}</i>";
           player-icons = {
-            default = "▶";
-            mpv = "🎵";
+            default = "";
+            mpv = "󰝚";
           };
           status-icons = {
-            paused = "⏸";
+            paused = "";
           };
         };
         "tray" = {
@@ -161,23 +161,23 @@ in {
           };
         };
         "network" = {
-          format-wifi = "{essid} ({signalStrength}%) ";
-          format-ethernet = "  {ifname}";
-          tooltip-format = "  {ifname} via {gwaddr}";
-          format-linked = "  {ifname} (No IP)";
-          format-disconnected = "Disconnected ⚠ {ifname}";
-          format-alt = "  {ifname}: {ipaddr}/{cidr}";
+          format-wifi = " {essid} {signalStrength}%";
+          format-ethernet = " {ifname}";
+          tooltip-format = " {ifname} via {gwaddr}";
+          format-linked = " {ifname} (no IP)";
+          format-disconnected = "󰌘 disconnected";
+          format-alt = " {ipaddr}/{cidr}";
         };
         "pulseaudio" = {
           scroll-step = 5;
-          format = "{icon}   {volume}% {format_source}";
-          format-bluetooth = " {icon}   {volume}% {format_source}";
-          format-bluetooth-muted = "🔇  {icon}   {format_source}";
-          format-muted = "   MUTED {format_source}";
+          format = "{icon} {volume}%{format_source}";
+          format-bluetooth = " {volume}%{format_source}";
+          format-bluetooth-muted = " muted{format_source}";
+          format-muted = " muted{format_source}";
           format-source = "";
           format-source-muted = "";
           format-icons = {
-             headphone = "";
+            headphone = "";
             hands-free = "";
             headset = "";
             phone = "";
@@ -223,8 +223,8 @@ in {
         background-color: transparent;
       }
 
-      .modules-right .module, #workspaces button {
-        padding: 0px 6px;
+      .module, #workspaces button {
+        padding: 0px 8px;
         border: none;
         border-radius: 0;
         color: @text;
@@ -246,16 +246,22 @@ in {
       }
 
       #window {
-        margin: 0px 2px;
-        padding-left: 8px;
-        padding-right: 8px;
         background-color: @surface0;
-        font-size: 14px;
         font-weight: bold;
       }
 
       #clock {
         font-weight: bold;
+      }
+
+      #keyboard-state, #keyboard-state label {
+        padding: 0;
+      }
+
+      #keyboard-state label.locked {
+        padding: 0px 8px;
+        background-color: @peach;
+        color: @crust;
       }
 
       #custom-stats {
