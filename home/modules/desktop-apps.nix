@@ -12,7 +12,8 @@ let
 
       desktop=share/applications/com.github.th-ch.youtube-music.desktop
       rm $out/$desktop
-      sed 's|^Exec=pear-desktop|Exec=youtube-music|' ${pkgs.pear-desktop}/$desktop > $out/$desktop
+      sed -e 's|^Exec=pear-desktop|Exec=youtube-music|' -e 's|^Name=.*|Name=YouTube Music|' \
+        ${pkgs.pear-desktop}/$desktop > $out/$desktop
     '';
   };
 in
