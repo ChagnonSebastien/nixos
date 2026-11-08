@@ -1,4 +1,21 @@
 { pkgs, ... }:
+let
+  youtube-music = pkgs.symlinkJoin {
+    name = "youtube-music";
+    paths = [ pkgs.pear-desktop ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    meta.mainProgram = "youtube-music";
+    postBuild = ''
+      rm $out/bin/pear-desktop
+      makeWrapper ${pkgs.pear-desktop}/bin/pear-desktop $out/bin/youtube-music \
+        --add-flags "--disk-cache-size=104857600"
+
+      desktop=share/applications/com.github.th-ch.youtube-music.desktop
+      rm $out/$desktop
+      sed 's|^Exec=pear-desktop|Exec=youtube-music|' ${pkgs.pear-desktop}/$desktop > $out/$desktop
+    '';
+  };
+in
 {
   # GUI apps shared by every graphical machine.
   home.packages = with pkgs; [
