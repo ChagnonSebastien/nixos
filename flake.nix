@@ -24,9 +24,13 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    tagstudio = {
+      url = "github:TagStudioDev/TagStudio";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, tagstudio, ... }:
     let
       system = "x86_64-linux";
 
@@ -46,7 +50,7 @@
         nixpkgs      = nixpkgs-unstable;
         home-manager = home-manager-unstable;
         nixvim       = nixvim-unstable;
-        overlays     = [ ];
+        overlays     = [ (_final: _prev: { inherit (tagstudio.packages.${system}) tagstudio; }) ];
       };
 
       # A NixOS host with home-manager (and nixvim) wired up for user seb.

@@ -58,6 +58,27 @@
         "type": "github"
       }
     },
+    "flake-parts_3": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "tagstudio",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1787559586,
+        "narHash": "sha256-onL0VLf9vPllmT0H/OlURIU5r5t5WIEl7t4tVNKT0Nw=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "9d0d87172c374f89da73c1cfe6d81ae62feac1f1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -206,7 +227,8 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nixvim": "nixvim",
-        "nixvim-unstable": "nixvim-unstable"
+        "nixvim-unstable": "nixvim-unstable",
+        "tagstudio": "tagstudio"
       }
     },
     "systems": {
@@ -238,6 +260,43 @@
         "owner": "nix-systems",
         "ref": "future-26.11",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_3": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "tagstudio": {
+      "inputs": {
+        "flake-parts": "flake-parts_3",
+        "nixpkgs": [
+          "nixpkgs-unstable"
+        ],
+        "systems": "systems_3"
+      },
+      "locked": {
+        "lastModified": 1793950476,
+        "narHash": "sha256-gNUVuGTj7v8p5HCAbyd3gjy1FuyhMLsJMDUq/hafknI=",
+        "owner": "TagStudioDev",
+        "repo": "TagStudio",
+        "rev": "246f162a70b67203ca4d8a425b0ba4c61cf25468",
+        "type": "github"
+      },
+      "original": {
+        "owner": "TagStudioDev",
+        "repo": "TagStudio",
         "type": "github"
       }
     }
