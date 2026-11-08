@@ -10,7 +10,7 @@
 
         smartctl -j --scan-open | jq -r '.devices[] | "\(.name) \(.type)"' |
         while read -r dev type; do
-          j=$(smartctl -j -d "$type" -i -c -l selftest "$dev" || true)
+          j=$(smartctl -j -d "$type" -i -c -A -l selftest "$dev" || true)
           echo "$j" | jq -r --arg dev "$dev" '"\($dev)  \(.model_name // "?") (\(.serial_number // "?"))"'
           echo
           echo "$j" | jq -r '
@@ -26,14 +26,19 @@
                   then "test in progress (\(100 - ($n.current_self_test_completion_percent // 0))% remaining)"
                   else "no test in progress" end
               else "self-test not supported" end;
-            def last:
-              ( [ .ata_smart_self_test_log.standard.table[]? | select(.status.value < 240) ][0]
-                | select(. != null)
-                | "\(.type.string): \(.status.string) at \(.lifetime_hours)h" )
-              // ( .nvme_self_test_log.table[0] | select(. != null)
-                | "\(.self_test_code.string): \(.self_test_result.string) at \(.power_on_hours)h" )
-              // "none logged";
-            "* \(status)", "* last result: \(last)"
+            (.power_on_time.hours // .nvme_smart_health_information_log.power_on_hours) as $now
+            | def ago($h; $wrap):
+                if $now == null then ""
+                else " (\(if $wrap then ($now - $h) % 65536 else $now - $h end)h ago)" end;
+              def last:
+                # ATA self-test log stores lifetime hours in 16 bits, so it wraps at 65536
+                ( [ .ata_smart_self_test_log.standard.table[]? | select(.status.value < 240) ][0]
+                  | select(. != null)
+                  | "\(.type.string): \(.status.string) at \(.lifetime_hours)h\(ago(.lifetime_hours; true))" )
+                // ( .nvme_self_test_log.table[0] | select(. != null)
+                  | "\(.self_test_code.string): \(.self_test_result.string) at \(.power_on_hours)h\(ago(.power_on_hours; false))" )
+                // "none logged";
+              "* power on: \(if $now then "\($now)h" else "unknown" end)", "* \(status)", "* last result: \(last)"
           '
           echo
         done
