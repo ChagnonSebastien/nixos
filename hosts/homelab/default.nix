@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   imports = [
     ./hardware.nix
@@ -71,6 +71,18 @@
   };
 
   systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/hdd-1" ];
+
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "Tue *-*-01..07 02:00:00";
+  };
+
+  # module default AccuracySec=1d lets the scrub start up to a day late
+  systemd.timers = lib.genAttrs [
+    "btrfs-scrub-media-hdd\\x2d1"
+    "btrfs-scrub-media-bulk\\x2dseagate"
+    "btrfs-scrub-media-important"
+  ] (_: { timerConfig.AccuracySec = lib.mkForce "1min"; });
 
   # nixpkgs only sets Requires=, so GPU containers race the CDI spec and die
   systemd.services.docker.after = [ "nvidia-container-toolkit-cdi-generator.service" ];
