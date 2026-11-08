@@ -54,6 +54,8 @@
       hl.env("XDG_SESSION_TYPE", "wayland")
       hl.env("GBM_BACKEND", "nvidia-drm")
       hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+      -- nvidia's resume modeset overruns the rtkit RLIMIT_RTTIME hard limit and the kernel SIGKILLs Hyprland
+      hl.env("HYPRLAND_NO_RT", "1")
 
       -- Look and feel
       hl.config({
