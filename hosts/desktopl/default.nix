@@ -7,6 +7,7 @@
     ../../modules/kvm.nix
     ../../modules/boot-grub.nix
     ../../modules/nvidia-gpu.nix
+    ../../modules/smart-desktop.nix
     ../../modules/docker-rootless.nix
     ../../modules/desktop-environment/shared.nix
     ../../modules/desktop-environment/hyprland.nix
