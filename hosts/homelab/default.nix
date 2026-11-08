@@ -70,7 +70,7 @@
     };
   };
 
-  systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/hdd-1" ];
+  systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/hdd-1" "/media/bulk-seagate" "/media/important" ];
 
   services.btrfs.autoScrub = {
     enable = true;
