@@ -24,7 +24,7 @@
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
-  fileSystems."/media/hdd-1" = {
+  fileSystems."/media/bulk-toshiba" = {
     device = "/dev/disk/by-label/bulk-toshiba";
     fsType = "btrfs";
     options = [ "subvol=data" "noatime" "compress=zstd" "nofail" ];

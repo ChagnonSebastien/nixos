@@ -70,7 +70,7 @@
     };
   };
 
-  systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/hdd-1" "/media/bulk-seagate" "/media/important" ];
+  systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/bulk-toshiba" "/media/bulk-seagate" "/media/important" ];
 
   services.btrfs.autoScrub = {
     enable = true;
@@ -79,7 +79,7 @@
 
   # module default AccuracySec=1d lets the scrub start up to a day late
   systemd.timers = lib.genAttrs [
-    "btrfs-scrub-media-hdd\\x2d1"
+    "btrfs-scrub-media-bulk\\x2dtoshiba"
     "btrfs-scrub-media-bulk\\x2dseagate"
     "btrfs-scrub-media-important"
   ] (_: { timerConfig.AccuracySec = lib.mkForce "1min"; });
