@@ -1,11 +1,13 @@
-{ config, pkgs, lib, ...}: {
-
-  options.desktop.sleepCommand = lib.mkOption {
-    type = lib.types.str;
-    default = "systemctl suspend";
-  };
-
-  config = {
+{ config, pkgs, lib, ...}: let
+  # nvidia legacy_580 stalls frames still in flight at suspend: blank the outputs and let the GPU drain first.
+  suspendQuietly = pkgs.writeShellScript "suspend-quietly" ''
+    pidof hyprlock || hyprlock -q &
+    sleep 1
+    hyprctl dispatch 'hl.dsp.dpms({ action = "off" })'
+    sleep 2
+    systemctl suspend
+  '';
+in {
 
   home.pointerCursor = {
     enable = true;
@@ -293,7 +295,7 @@
       ];
 
       label = [
-        (powerButton "󰤄" config.desktop.sleepCommand 6)
+        (powerButton "󰤄" "${suspendQuietly}" 6)
         (powerButton "󰜉" "systemctl reboot" 30)
         (powerButton "󰐥" "systemctl poweroff" 54)
         (barLabel {
@@ -373,10 +375,9 @@
         }
         {
           timeout = 3600;
-          on-timeout = config.desktop.sleepCommand;
+          on-timeout = "${suspendQuietly}";
         }
       ];
     };
-  };
   };
 }
