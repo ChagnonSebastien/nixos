@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   imports = [
     ./hardware.nix
@@ -32,24 +32,6 @@
 
   # This desktop's older GPU needs the legacy_580 driver branch.
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
-
-  # legacy_580 drops GPU fence waits submitted before nvidia-resume finishes, freezing the screen on wake.
-  systemd.services = let
-    signalHyprland = sig: {
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "-${pkgs.procps}/bin/pkill -${sig} -f '^Hyprland( |$)'";
-      };
-      wantedBy = [ "systemd-suspend.service" "systemd-hibernate.service" ];
-    };
-  in {
-    hyprland-sleep-pause = signalHyprland "STOP" // {
-      before = [ "nvidia-suspend.service" "nvidia-hibernate.service" "systemd-suspend.service" "systemd-hibernate.service" ];
-    };
-    hyprland-sleep-continue = signalHyprland "CONT" // {
-      after = [ "nvidia-resume.service" "systemd-suspend.service" "systemd-hibernate.service" ];
-    };
-  };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
