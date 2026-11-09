@@ -27,19 +27,19 @@
   fileSystems."/media/hdd-1" = {
     device = "/dev/disk/by-label/bulk-toshiba";
     fsType = "btrfs";
-    options = [ "subvol=data" "noatime" "compress=zstd" ];
+    options = [ "subvol=data" "noatime" "compress=zstd" "nofail" ];
   };
 
   fileSystems."/media/bulk-seagate" = {
     device = "/dev/disk/by-label/bulk-seagate";
     fsType = "btrfs";
-    options = [ "subvol=data" "noatime" "compress=zstd" ];
+    options = [ "subvol=data" "noatime" "compress=zstd" "nofail" ];
   };
 
   fileSystems."/media/important" = {
     device = "/dev/disk/by-label/important";
     fsType = "btrfs";
-    options = [ "subvol=data" "noatime" "compress=zstd" ];
+    options = [ "subvol=data" "noatime" "compress=zstd" "nofail" ];
   };
 
     #{ device = "UUID=605aa600-775b-4a6e-8eb3-86d69337e46b";
