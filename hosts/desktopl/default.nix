@@ -33,6 +33,9 @@
   # This desktop's older GPU needs the legacy_580 driver branch.
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
 
+  # Hibernate instead of S3: legacy_580 can leave the screen frozen on resume from suspend.
+  swapDevices = [ { device = "/var/lib/swapfile"; size = 32 * 1024; } ];
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #

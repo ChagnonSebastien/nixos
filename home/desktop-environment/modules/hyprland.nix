@@ -1,5 +1,12 @@
 { config, pkgs, lib, ...}: {
 
+  options.desktop.sleepCommand = lib.mkOption {
+    type = lib.types.str;
+    default = "systemctl suspend";
+  };
+
+  config = {
+
   home.pointerCursor = {
     enable = true;
     package = pkgs.catppuccin-cursors.mochaDark;
@@ -286,7 +293,7 @@
       ];
 
       label = [
-        (powerButton "󰤄" "systemctl suspend" 6)
+        (powerButton "󰤄" config.desktop.sleepCommand 6)
         (powerButton "󰜉" "systemctl reboot" 30)
         (powerButton "󰐥" "systemctl poweroff" 54)
         (barLabel {
@@ -366,11 +373,10 @@
         }
         {
           timeout = 1800;
-          on-timeout = "systemctl suspend";
+          on-timeout = config.desktop.sleepCommand;
         }
       ];
     };
   };
-
+  };
 }
-
