@@ -95,6 +95,12 @@
           channel      = stable;
           extraModules = [ nixos-wsl.nixosModules.default ];
         };
+      } // {
+        # Deliberately outside mkHost: no home-manager, docker or nvidia, so it stays small.
+        homelab-rescue = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ ./hosts/homelab-rescue ];
+        };
       };
     };
 }
