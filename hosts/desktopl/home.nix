@@ -5,8 +5,6 @@
     ../../home/desktop-environment/hyprland.nix
   ];
 
-  desktop.sleepCommand = "systemctl hibernate";
-
   home.packages = with pkgs; [
     qview
     (mpv.override {
