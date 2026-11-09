@@ -33,6 +33,9 @@
   # This desktop's older GPU needs the legacy_580 driver branch.
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
 
+  # Overwrites the RTC clock on every suspend; drop once the S3 hang device is found.
+  systemd.tmpfiles.rules = [ "w /sys/power/pm_trace - - - - 1" ];
+
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
   #
