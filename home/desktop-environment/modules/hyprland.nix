@@ -372,7 +372,7 @@
           on-resume  = dpms "on";
         }
         {
-          timeout = 1800;
+          timeout = 3600;
           on-timeout = config.desktop.sleepCommand;
         }
       ];
