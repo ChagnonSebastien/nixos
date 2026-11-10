@@ -40,6 +40,8 @@
     "ramoops.console_size=1048576"
     "ramoops.record_size=262144"
     "no_console_suspend"
+    # Built-in efi_pstore otherwise takes the single pstore backend slot and ramoops fails with EBUSY.
+    "efi_pstore.pstore_disable=1"
   ];
   boot.kernelModules = [ "ramoops" ];
   # Otherwise systemd-pstore can run before ramoops loads and skip archiving the hang log.
