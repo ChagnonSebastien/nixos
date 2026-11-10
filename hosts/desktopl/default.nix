@@ -33,8 +33,28 @@
   # This desktop's older GPU needs the legacy_580 driver branch.
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
 
-  # Overwrites the RTC clock on every suspend; drop once the S3 hang device is found.
-  systemd.tmpfiles.rules = [ "w /sys/power/pm_trace - - - - 1" ];
+  # S3 resume hang diagnosis: drop this block once the hanging device is found.
+  boot.kernelParams = [
+    "reserve_mem=2M:4096:oops"
+    "ramoops.mem_name=oops"
+    "ramoops.console_size=1048576"
+    "ramoops.record_size=262144"
+    "no_console_suspend"
+  ];
+  boot.kernelModules = [ "ramoops" ];
+  # Otherwise systemd-pstore can run before ramoops loads and skip archiving the hang log.
+  systemd.services.systemd-pstore.after = [ "systemd-modules-load.service" ];
+  # pm_print_times logs each device callback at KERN_INFO, which ramoops only captures at console level 7.
+  boot.consoleLogLevel = 7;
+  systemd.tmpfiles.rules = [
+    "w /sys/power/pm_print_times - - - - 1"
+    "w /sys/power/pm_debug_messages - - - - 1"
+  ];
+  # watchdog0 is intel_oc_wdt; probe order decides the numbering.
+  systemd.settings.Manager = {
+    WatchdogDevice = "/dev/watchdog1";
+    RuntimeWatchdogSec = "30s";
+  };
 
   # This option defines the first version of NixOS you have installed on this particular machine,
   # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
