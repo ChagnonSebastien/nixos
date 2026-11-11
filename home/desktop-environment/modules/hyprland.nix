@@ -7,6 +7,17 @@
     sleep 2
     systemctl suspend
   '';
+  # dpms on during nvidia-resume is acked but never lights the outputs; cycling forces a real modeset.
+  wakeScreens = pkgs.writeShellScript "wake-screens" ''
+    sleep 1
+    for _ in $(seq 50); do
+      [ "$(systemctl show -P ActiveState nvidia-resume.service)" = activating ] || break
+      sleep 0.2
+    done
+    hyprctl dispatch 'hl.dsp.dpms({ action = "off" })'
+    sleep 0.5
+    hyprctl dispatch 'hl.dsp.dpms({ action = "on" })'
+  '';
 in {
 
   home.pointerCursor = {
@@ -356,7 +367,7 @@ in {
       general = {
         lock_cmd = "pidof hyprlock || hyprlock -q";
         before_sleep_cmd = "loginctl lock-session";
-        after_sleep_cmd  = dpms "on";
+        after_sleep_cmd  = "${wakeScreens}";
         unlock_cmd       = dpms "on";
 
         ignore_dbus_inhibit = false;
