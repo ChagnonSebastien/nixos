@@ -70,7 +70,7 @@
     };
   };
 
-  systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/bulk-toshiba" "/media/bulk-seagate" "/media/important" ];
+  systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/bulk-toshiba" "/media/bulk-seagate" "/media/bulk" "/media/important" ];
 
   services.btrfs.autoScrub = {
     enable = true;
