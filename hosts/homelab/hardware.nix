@@ -36,6 +36,24 @@
     options = [ "subvol=data" "noatime" "compress=zstd" "nofail" ];
   };
 
+  fileSystems."/media/bulk" = {
+    device = "/media/bulk-seagate:/media/bulk-toshiba";
+    fsType = "mergerfs";
+    depends = [ "/media/bulk-seagate" "/media/bulk-toshiba" ];
+    options = [
+      "category.create=mspmfs"
+      "ignorepponrename=true"
+      "minfreespace=100G"
+      "moveonenospc=true"
+      "func.getattr=newest"
+      "cache.files=off"
+      "fsname=bulk"
+      "nofail"
+    ];
+  };
+
+  system.fsPackages = [ pkgs.mergerfs ];
+
   fileSystems."/media/important" = {
     device = "/dev/disk/by-label/important";
     fsType = "btrfs";
