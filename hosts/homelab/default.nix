@@ -33,26 +33,33 @@
     interface = "enp42s0";
   };
 
-  networking.wireguard.interfaces.wg-phone = {
+  networking.wireguard.interfaces.wg-home = {
     ips = [ "10.7.0.1/24" ];
     listenPort = 51821;
-    privateKeyFile = "/var/lib/wireguard/wg-phone.key";
+    # if missing a fresh key is generated and every peer must be reconfigured
+    privateKeyFile = "/var/lib/wireguard/wg-home.key";
     generatePrivateKeyFile = true;
-    peers = [{
-      publicKey = "T4pPomAl7cPP/LVBcHvxjzSRqYJb/ZpPxnBlObZ710o=";
-      allowedIPs = [ "10.2.0.2/32" ];
-    }];
+    peers = [
+      {
+        publicKey = "T4pPomAl7cPP/LVBcHvxjzSRqYJb/ZpPxnBlObZ710o=";
+        allowedIPs = [ "10.2.0.2/32" ];
+      }
+      {
+        publicKey = "n90nNFBkbpqHjeHAKSIwZfEiahtkNLzykQwTvS/c8j8=";
+        allowedIPs = [ "10.2.0.3/32" ];
+      }
+    ];
   };
 
   networking.nat = {
     enable = true;
-    internalInterfaces = [ "wg-phone" ];
+    internalInterfaces = [ "wg-home" ];
     externalInterface = "enp42s0";
     extraCommands = ''
-      iptables -C FORWARD -i wg-phone -o enp42s0 -j ACCEPT 2>/dev/null || \
-      iptables -A FORWARD -i wg-phone -o enp42s0 -j ACCEPT
-      iptables -C FORWARD -i enp42s0 -o wg-phone -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || \
-      iptables -A FORWARD -i enp42s0 -o wg-phone -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -C FORWARD -i wg-home -o enp42s0 -j ACCEPT 2>/dev/null || \
+      iptables -A FORWARD -i wg-home -o enp42s0 -j ACCEPT
+      iptables -C FORWARD -i enp42s0 -o wg-home -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || \
+      iptables -A FORWARD -i enp42s0 -o wg-home -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     '';
   };
 
