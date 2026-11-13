@@ -1,5 +1,5 @@
 # Android phone allow list (assign to Phone group)
-# Last updated: 2026-11-02
+# Last updated: 2026-11-13
 
 # Google APIs, Play Store
 www.googleapis.com
@@ -26,3 +26,8 @@ events.launchdarkly.com
 # Meta Graph API; Messenger cannot submit forms without it.
 # Blocked upstream by hagezi ultimate.txt as ||graph.facebook.com^
 graph.facebook.com
+
+# Firebase Remote Config + its installation token; La Presse never opens articles without them.
+# firebaseinstallations is blocked upstream, firebaseremoteconfig by general.txt
+firebaseremoteconfig.googleapis.com
+firebaseinstallations.googleapis.com
