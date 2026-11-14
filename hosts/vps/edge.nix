@@ -1,6 +1,6 @@
 # Public edge for the homelab, replacing the Cloudflare proxy.
 #
-#   visitor ──https──▶ VPS Caddy ──https + client cert, inside wg-vps──▶ homelab Caddy
+#   visitor ──https──▶ VPS Caddy ──https + client cert, inside wg-vps──▶ homelab Caddy (:24443)
 #
 # - The homelab dials wg-vps out to this VPS's fixed IP and keeps it alive, so a new home
 #   IP is picked up by WireGuard roaming; nothing has to report it.
@@ -10,8 +10,8 @@
 # - cloudflare-dyndns keeps the DNS records pointed at this VPS, unproxied.
 { lib, pkgs, ... }:
 let
-  # Fill in from the homelab: `sudo wg show wg-vps public-key`.
-  homelabPublicKey = null;
+  # From the homelab: `sudo wg show wg-vps public-key`.
+  homelabPublicKey = "vNdn2qkQn0asTzWtiy9NtNwAon8VxyCGHqkb2P+SXwg=";
 
   originPullDir = "/var/lib/origin-pull";
 
@@ -71,7 +71,8 @@ in
     email = "sebastien.chagnon@proton.me";
     extraConfig = ''
       (homelab) {
-        reverse_proxy https://10.8.0.2 {
+        # host port 24443 is the caddy container's 443
+        reverse_proxy https://10.8.0.2:24443 {
           # Same visitor-IP headers Cloudflare sent; `header_up` overwrites any the visitor supplies.
           # X-Forwarded-For/-Proto/-Host are set by Caddy itself.
           header_up CF-Connecting-IP {remote_host}

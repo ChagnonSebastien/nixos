@@ -53,7 +53,8 @@
 
   # Tunnel to the VPS edge (hosts/vps/edge.nix). We dial out to its fixed IP, so a new home
   # IP needs no reporting and no port forward. The VPS is treated as untrusted: the
-  # wg-vps-in chain lets it open connections only to Caddy (10.8.0.2:443, which also
+  # wg-vps-in chain lets it open connections only to Caddy (10.8.0.2:24443, the caddy
+  # container's published 443, which also
   # demands the VPS client cert), never to other ports here or to the LAN. It sits in
   # mangle PREROUTING so it runs before Docker's DNAT and before routing/forwarding.
   networking.wireguard.interfaces.wg-vps = {
@@ -72,7 +73,7 @@
     postSetup = ''
       ${pkgs.iptables}/bin/iptables -t mangle -N wg-vps-in 2>/dev/null || ${pkgs.iptables}/bin/iptables -t mangle -F wg-vps-in
       ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
-      ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d 10.8.0.2 -p tcp --dport 443 -m conntrack --ctstate NEW -j RETURN
+      ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d 10.8.0.2 -p tcp --dport 24443 -m conntrack --ctstate NEW -j RETURN
       ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -j DROP
       ${pkgs.iptables}/bin/iptables -t mangle -C PREROUTING -i wg-vps -j wg-vps-in 2>/dev/null || \
         ${pkgs.iptables}/bin/iptables -t mangle -I PREROUTING -i wg-vps -j wg-vps-in
