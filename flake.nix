@@ -88,9 +88,9 @@
         };
     in {
       nixosConfigurations = builtins.mapAttrs mkHost {
-        desktopl.channel = unstable;
+        desktop.channel  = unstable;
+        laptop.channel   = unstable;
         homelab.channel  = stable;
-        work.channel     = stable;
         wsl = {
           channel      = stable;
           extraModules = [ nixos-wsl.nixosModules.default ];

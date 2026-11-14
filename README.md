@@ -6,9 +6,9 @@ NixOS + home-manager configuration for all my machines, as a single flake.
 
 | Host       | Channel  | What it is                                          |
 |------------|----------|-----------------------------------------------------|
-| `desktopl` | unstable | Personal desktop: Hyprland, NVIDIA (legacy_580), Steam |
+| `desktop`  | unstable | Personal desktop: Hyprland, NVIDIA (legacy_580), Steam |
+| `laptop`   | unstable | Personal laptop: KDE Plasma, NVIDIA, dev tooling    |
 | `homelab`  | stable   | Home server: static IP, Docker, WireGuard, Pi-hole lists |
-| `work`     | stable   | Work laptop: KDE Plasma, NVIDIA, dev tooling        |
 | `wsl`      | stable   | NixOS-WSL on Windows: Docker, dev tooling           |
 
 ## Usage
