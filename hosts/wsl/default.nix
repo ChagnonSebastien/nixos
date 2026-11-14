@@ -7,6 +7,11 @@
   wsl.enable = true;
   wsl.defaultUser = "seb";
 
+  boot.binfmt = {
+    emulatedSystems = [ "aarch64-linux" ];
+    preferStaticEmulators = true;
+  };
+
   virtualisation.docker = {
     enable = true;
     listenOptions = [ "/var/run/docker.sock" "127.0.0.1:2375" ];
