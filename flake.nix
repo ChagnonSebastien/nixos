@@ -24,13 +24,17 @@
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     tagstudio = {
       url = "github:TagStudioDev/TagStudio";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, tagstudio, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, disko, tagstudio, ... }:
     let
       system = "x86_64-linux";
 
@@ -97,6 +101,10 @@
         };
       } // {
         # Deliberately outside mkHost: no home-manager, docker or nvidia, so it stays small.
+        vps = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ disko.nixosModules.disko ./hosts/vps ];
+        };
         homelab-rescue = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [ ./hosts/homelab-rescue ];

@@ -10,6 +10,7 @@ NixOS + home-manager configuration for all my machines, as a single flake.
 | `laptop`   | unstable | Personal laptop: KDE Plasma, NVIDIA, dev tooling    |
 | `homelab`  | stable   | Home server: static IP, Docker, WireGuard, Pi-hole lists |
 | `wsl`      | stable   | NixOS-WSL on Windows: Docker, dev tooling           |
+| `vps`      | stable   | OVH VPS: minimal, no home-manager, disk layout via disko |
 
 ## Usage
 
