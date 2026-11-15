@@ -1,4 +1,7 @@
 { pkgs, ... }:
+let
+  net = import ../../lib/network.nix;
+in
 {
   imports = [
     ./hardware.nix
@@ -19,7 +22,7 @@
   systemd.network.networks."10-wan" = {
     matchConfig.Name = "en*";
     networkConfig.DHCP = "ipv4";
-    address = [ "2607:5300:205:200::fccc/64" ];
+    address = [ "${net.vps.ipv6}/64" ];
     routes = [ { Gateway = "2607:5300:205:200::1"; GatewayOnLink = true; } ];
   };
 

@@ -4,6 +4,8 @@
 # a tunnel outage apart from a single service being down. Names are for end users.
 { lib, ... }:
 let
+  net = import ../../lib/network.nix;
+
   # Shown in this order (Gatus itself only sorts by name/group/health; CSS reorders).
   services = [
     { name = "Authentication services"; url = "https://auth.chagnon.dev/realms/master"; conditions = [ "[STATUS] == 200" "[BODY].realm == master" ]; }
@@ -51,7 +53,7 @@ in
           # the wg-vps tunnel to the homelab Caddy; when this is down, every service is
           name = "Server online";
           group = "Server";
-          url = "tcp://10.8.0.2:24443";
+          url = "tcp://${net.wgVps.homelab.ip}:${toString net.homelab.caddyPort}";
           interval = "30s";
           conditions = [ "[CONNECTED] == true" ];
         }

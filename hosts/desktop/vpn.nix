@@ -1,5 +1,6 @@
 { lib, ... }:
 let
+  net = import ../../lib/network.nix;
   envFile = "/var/lib/nm-vpn/wireguard.env";
 
   wireguard =
@@ -51,14 +52,14 @@ let
       keyVar = "ICELAND_WG_KEY";
       publicKey = "yKbYe2XwbeNN9CuPZcwMF/lJp6a62NEGiHCCfpfxrnE=";
       endpoint = "185.159.158.1:51820";
-      dns = "192.168.0.2;10.2.0.1;";
+      dns = "${net.homelab.lanIp};10.2.0.1;";
     };
     usa = wireguard {
       id = "usa";
       keyVar = "USA_WG_KEY";
       publicKey = "XeVyTJgexTGQ6w9xmiosAH6w86n8d7QKs3NBzU0Ze3k=";
       endpoint = "149.88.21.1:51820";
-      dns = "192.168.0.2;10.2.0.1;";
+      dns = "${net.homelab.lanIp};10.2.0.1;";
     };
   };
 in

@@ -37,7 +37,8 @@ hosts/<name>/
   hardware.nix         generated hardware config
   home.nix             home-manager config for seb on that host
 modules/               NixOS modules; hosts import what they need
-  desktop-environment/ Hyprland, Plasma, COSMIC + shared greetd/pipewire
+  desktop-environment/ Hyprland, Plasma + shared greetd/pipewire
+lib/network.nix        IPs, ports and WireGuard keys shared between hosts
 home/
   modules/             home-manager modules (shell, nvim, git, devtools, ...)
   desktop-environment/ per-desktop home-manager config

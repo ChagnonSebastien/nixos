@@ -1,4 +1,7 @@
 { pkgs, ... }:
+let
+  net = import ../../lib/network.nix;
+in
 {
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
 
@@ -27,8 +30,8 @@
   networking = {
     hostName = "homelab-rescue";
     useDHCP = false;
-    interfaces.enp42s0.ipv4.addresses = [ { address = "192.168.0.2"; prefixLength = 24; } ];
-    defaultGateway = "192.168.0.1";
+    interfaces.${net.homelab.lanInterface}.ipv4.addresses = [ { address = net.homelab.lanIp; inherit (net.lan) prefixLength; } ];
+    defaultGateway = net.lan.gateway;
     nameservers = [ "1.1.1.1" "1.0.0.1" ];
   };
 

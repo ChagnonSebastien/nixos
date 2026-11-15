@@ -4,6 +4,9 @@
 # registration, so no attack data is sent to crowdsec.net and no community blocklist.
 # To enforce later: turn simulation off and add services.crowdsec-firewall-bouncer.
 { lib, ... }:
+let
+  net = import ../../lib/network.nix;
+in
 {
   options.services.caddy.virtualHosts = lib.mkOption {
     # Caddy writes access logs 0600; make them group-readable so CrowdSec (in group caddy)
@@ -45,8 +48,8 @@
             description = "Never flag the VPS itself (Gatus checks), localhost or the homelab tunnel";
             whitelist = {
               reason = "own infrastructure";
-              ip = [ "198.245.55.120" "2607:5300:205:200::fccc" "127.0.0.1" "::1" ];
-              cidr = [ "10.8.0.0/24" ];
+              ip = [ net.vps.ipv4 net.vps.ipv6 "127.0.0.1" "::1" ];
+              cidr = [ net.wgVps.subnet ];
             };
           }
         ];

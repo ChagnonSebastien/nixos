@@ -1,4 +1,8 @@
 { lib, pkgs, ... }:
+let
+  net = import ../../lib/network.nix;
+  wgv = net.wgVps;
+in
 {
   imports = [
     ./hardware.nix
@@ -17,25 +21,25 @@
   networking.networkmanager.enable = false;
   networking.useDHCP = false;
 
-  networking.interfaces.enp42s0 = {
+  networking.interfaces.${net.homelab.lanInterface} = {
     useDHCP = false;
 
     ipv4.addresses = [
       {
-        address = "192.168.0.2";
-        prefixLength = 24;
+        address = net.homelab.lanIp;
+        inherit (net.lan) prefixLength;
       }
     ];
   };
 
   networking.defaultGateway = {
-    address = "192.168.0.1";
-    interface = "enp42s0";
+    address = net.lan.gateway;
+    interface = net.homelab.lanInterface;
   };
 
   networking.wireguard.interfaces.wg-home = {
     ips = [ "10.7.0.1/24" ];
-    listenPort = 51821;
+    listenPort = net.homelab.wgHomePort;
     # clients arrive relayed through the VPS (hosts/vps/vpn-relay.nix), i.e. WireGuard inside
     # WireGuard; 1280 leaves room for both headers on any network
     mtu = 1280;
@@ -61,24 +65,24 @@
   # port (51821/udp), never to other ports here or to the LAN. It sits in mangle PREROUTING
   # so it runs before Docker's DNAT and before routing/forwarding.
   networking.wireguard.interfaces.wg-vps = {
-    ips = [ "10.8.0.2/24" ];
+    ips = [ "${wgv.homelab.ip}/${toString wgv.prefixLength}" ];
     # if missing a fresh key is generated and the VPS peer must be updated
     privateKeyFile = "/var/lib/wireguard/wg-vps.key";
     generatePrivateKeyFile = true;
     peers = [
       {
-        publicKey = "/02pfCsNoefcrrg7Rl1R9mhmElz8OkhyOxNFL80d1C4=";
-        endpoint = "198.245.55.120:51820";
-        allowedIPs = [ "10.8.0.1/32" ];
+        inherit (wgv.vps) publicKey;
+        endpoint = "${net.vps.ipv4}:${toString wgv.port}";
+        allowedIPs = [ "${wgv.vps.ip}/32" ];
         persistentKeepalive = 25;
       }
     ];
     postSetup = ''
       ${pkgs.iptables}/bin/iptables -t mangle -N wg-vps-in 2>/dev/null || ${pkgs.iptables}/bin/iptables -t mangle -F wg-vps-in
       ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
-      ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d 10.8.0.2 -p tcp --dport 24443 -m conntrack --ctstate NEW -j RETURN
+      ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d ${wgv.homelab.ip} -p tcp --dport ${toString net.homelab.caddyPort} -m conntrack --ctstate NEW -j RETURN
       # relayed wg-home VPN clients; WireGuard drops anything not signed by a client key
-      ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d 10.8.0.2 -p udp --dport 51821 -m conntrack --ctstate NEW -j RETURN
+      ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d ${wgv.homelab.ip} -p udp --dport ${toString net.homelab.wgHomePort} -m conntrack --ctstate NEW -j RETURN
       ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -j DROP
       ${pkgs.iptables}/bin/iptables -t mangle -C PREROUTING -i wg-vps -j wg-vps-in 2>/dev/null || \
         ${pkgs.iptables}/bin/iptables -t mangle -I PREROUTING -i wg-vps -j wg-vps-in
@@ -89,16 +93,16 @@
   networking.nat = {
     enable = true;
     internalInterfaces = [ "wg-home" ];
-    externalInterface = "enp42s0";
+    externalInterface = net.homelab.lanInterface;
     extraCommands = ''
-      iptables -C FORWARD -i wg-home -o enp42s0 -j ACCEPT 2>/dev/null || \
-      iptables -A FORWARD -i wg-home -o enp42s0 -j ACCEPT
-      iptables -C FORWARD -i enp42s0 -o wg-home -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || \
-      iptables -A FORWARD -i enp42s0 -o wg-home -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+      iptables -C FORWARD -i wg-home -o ${net.homelab.lanInterface} -j ACCEPT 2>/dev/null || \
+      iptables -A FORWARD -i wg-home -o ${net.homelab.lanInterface} -j ACCEPT
+      iptables -C FORWARD -i ${net.homelab.lanInterface} -o wg-home -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || \
+      iptables -A FORWARD -i ${net.homelab.lanInterface} -o wg-home -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     '';
   };
 
-  networking.nameservers = [ "192.168.0.2" ];
+  networking.nameservers = [ net.homelab.lanIp ];
 
   virtualisation.docker = {
     enable = true;

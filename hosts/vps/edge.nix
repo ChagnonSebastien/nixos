@@ -10,8 +10,8 @@
 # - cloudflare-dyndns keeps the DNS records pointed at this VPS, unproxied.
 { lib, pkgs, ... }:
 let
-  # From the homelab: `sudo wg show wg-vps public-key`.
-  homelabPublicKey = "vNdn2qkQn0asTzWtiy9NtNwAon8VxyCGHqkb2P+SXwg=";
+  net = import ../../lib/network.nix;
+  wgv = net.wgVps;
 
   originPullDir = "/var/lib/origin-pull";
 
@@ -38,19 +38,21 @@ in
   networking.firewall = {
     allowedTCPPorts = [ 80 443 ];
     # 443/udp: HTTP/3 (QUIC) to visitors; Caddy already listens and advertises it via Alt-Svc
-    allowedUDPPorts = [ 443 51820 ];
+    allowedUDPPorts = [ 443 wgv.port ];
   };
 
   networking.wireguard.interfaces.wg-vps = {
-    ips = [ "10.8.0.1/24" ];
-    listenPort = 51820;
+    ips = [ "${wgv.vps.ip}/${toString wgv.prefixLength}" ];
+    listenPort = wgv.port;
     # generated on the VPS; the homelab config pins its public key
     privateKeyFile = "/var/lib/wireguard/wg-vps.key";
-    peers = lib.optional (homelabPublicKey != null) {
-      publicKey = homelabPublicKey;
-      allowedIPs = [ "10.8.0.2/32" ];
-      # no endpoint: the homelab dials in, and its address may change
-    };
+    peers = [
+      {
+        inherit (wgv.homelab) publicKey;
+        allowedIPs = [ "${wgv.homelab.ip}/32" ];
+        # no endpoint: the homelab dials in, and its address may change
+      }
+    ];
   };
 
   # Private CA + client cert the VPS presents to the homelab Caddy (Cloudflare's
@@ -109,8 +111,7 @@ in
       }
 
       (homelab) {
-        # host port 24443 is the caddy container's 443
-        reverse_proxy https://10.8.0.2:24443 {
+        reverse_proxy https://${wgv.homelab.ip}:${toString net.homelab.caddyPort} {
           # Same visitor-IP headers Cloudflare sent; `header_up` overwrites any the visitor supplies.
           # X-Forwarded-For/-Proto/-Host are set by Caddy itself.
           # Caddy defaults Host to the upstream address for HTTPS upstreams; the homelab
