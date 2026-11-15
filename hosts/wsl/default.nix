@@ -6,6 +6,8 @@
 
   wsl.enable = true;
   wsl.defaultUser = "seb";
+  # the aarch64 binfmt registration below otherwise breaks running .exe files
+  wsl.interop.register = true;
 
   boot.binfmt = {
     emulatedSystems = [ "aarch64-linux" ];
