@@ -4,6 +4,7 @@
     ./hardware.nix
     ./edge.nix
     ./metrics.nix
+    ./status.nix
   ];
 
   # Boots via SeaBIOS (EF02 partition); the ESP is kept so a switch to UEFI just works.
@@ -37,6 +38,15 @@
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Every deploy adds a system generation; without this the store only ever grows.
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
+  };
+  nix.optimise.automatic = true;
+  boot.loader.grub.configurationLimit = 10;
   environment.systemPackages = with pkgs; [ git vim ];
 
   system.stateVersion = "26.05";
