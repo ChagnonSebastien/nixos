@@ -6,6 +6,7 @@ in
 {
   imports = [
     ./hardware.nix
+    ./bulk-consolidate.nix
     ../../modules/user.nix
     ../../modules/kvm.nix
     ../../modules/boot-grub.nix

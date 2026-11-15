@@ -28,6 +28,8 @@ sudo nixos-rebuild switch --flake .#<host>
 
 Update inputs with `nix flake update`.
 
+`nix flake check` runs the tests of the homelab's bulk pool consolidator.
+
 ## Layout
 
 ```

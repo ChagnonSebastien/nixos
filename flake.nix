@@ -97,6 +97,13 @@
           ];
         };
     in {
+      checks.${system}.bulk-consolidate =
+        let pkgs = nixpkgs.legacyPackages.${system};
+        in pkgs.runCommand "bulk-consolidate-test" { } ''
+          ${pkgs.python3}/bin/python3 -I ${./hosts/homelab/bulk-consolidate-test.py} ${./hosts/homelab/bulk-consolidate.py}
+          touch $out
+        '';
+
       nixosConfigurations = builtins.mapAttrs mkHost {
         desktop.channel  = unstable;
         laptop.channel   = unstable;
