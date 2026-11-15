@@ -16,7 +16,21 @@ let
   originPullDir = "/var/lib/origin-pull";
 
   # Hosts served through the homelab; each must also exist in the homelab Caddyfile.
-  homelabHosts = [ "example.chagnon.dev" ];
+  homelabHosts = [
+    "chagnon.dev"
+    "auth.chagnon.dev"
+    "editor.chagnon.dev"
+    "example.chagnon.dev"
+    "fintrospect.chagnon.dev"
+    "immich.chagnon.dev"
+    "jellyfin.chagnon.dev"
+    "jellyseerr.chagnon.dev"
+    "office.chagnon.dev"
+    "sebflix.chagnon.dev"
+    "vault.chagnon.dev"
+  ];
+
+  cloudflareTokenFile = "/var/lib/secrets/cloudflare-api-token";
 in
 {
   networking.firewall = {
@@ -69,6 +83,15 @@ in
   services.caddy = {
     enable = true;
     email = "sebastien.chagnon@proton.me";
+    # DNS-01, so certificates don't depend on where the records point (they can be issued
+    # before a host is cut over). Plugin scanned: only talks to api.cloudflare.com.
+    package = pkgs.caddy.withPlugins {
+      plugins = [ "github.com/caddy-dns/cloudflare@v0.2.4" ];
+      hash = "sha256-tubXIDCJnO2mvdnPlZclwDhNGaeeYLSt7lnni3+pXDo=";
+    };
+    globalConfig = ''
+      acme_dns cloudflare {file./run/credentials/caddy.service/cloudflare-api-token}
+    '';
     extraConfig = ''
       (homelab) {
         # host port 24443 is the caddy container's 443
@@ -93,12 +116,13 @@ in
   systemd.services.caddy = {
     requires = [ "origin-pull-cert.service" ];
     after = [ "origin-pull-cert.service" ];
+    serviceConfig.LoadCredential = [ "cloudflare-api-token:${cloudflareTokenFile}" ];
   };
 
   services.cloudflare-dyndns = {
     enable = true;
     # Cloudflare API token with Zone → DNS → Edit on chagnon.dev; just the token, root-only.
-    apiTokenFile = "/var/lib/secrets/cloudflare-api-token";
+    apiTokenFile = cloudflareTokenFile;
     domains = homelabHosts;
     proxied = false;
     ipv4 = true;
