@@ -43,7 +43,6 @@ in
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIb8DukSl7cKWd80kIYsMal4GGA9i/RVP/7PHp5Ko+i0 seb@vps"
   ];
 
-  nix.optimise.automatic = true;
   boot.loader.grub.configurationLimit = 10;
   environment.systemPackages = with pkgs; [ git vim ];
 
