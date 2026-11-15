@@ -20,7 +20,6 @@ let
     "chagnon.dev"
     "auth.chagnon.dev"
     "editor.chagnon.dev"
-    "example.chagnon.dev"
     "fintrospect.chagnon.dev"
     "immich.chagnon.dev"
     "jellyfin.chagnon.dev"
