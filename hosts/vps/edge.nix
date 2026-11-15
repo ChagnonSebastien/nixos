@@ -15,6 +15,9 @@ let
 
   originPullDir = "/var/lib/origin-pull";
 
+  # "Oopsy" page shown when a homelab site can't be reached (see the offline_page snippet)
+  offlinePage = pkgs.writeTextDir "offline.html" (builtins.readFile ./offline.html);
+
   # Hosts served through the homelab; each must also exist in the homelab Caddyfile.
   homelabHosts = [
     "chagnon.dev"
@@ -93,6 +96,18 @@ in
       acme_dns cloudflare {file./run/credentials/caddy.service/cloudflare-api-token}
     '';
     extraConfig = ''
+      # Friendly 503 with a link to status.chagnon.dev; {{.Host}} is filled in by `templates`.
+      (offline_page) {
+        root * ${offlinePage}
+        rewrite * /offline.html
+        header Cache-Control "no-store"
+        header Retry-After "60"
+        templates
+        file_server {
+          status 503
+        }
+      }
+
       (homelab) {
         # host port 24443 is the caddy container's 443
         reverse_proxy https://10.8.0.2:24443 {
@@ -108,6 +123,15 @@ in
             tls_server_name {http.request.host}
             tls_client_auth ${originPullDir}/client.pem ${originPullDir}/client.key
           }
+          # homelab Caddy is reachable but the app behind it isn't
+          @down status 502 503 504
+          handle_response @down {
+            import offline_page
+          }
+        }
+        # homelab itself is unreachable (tunnel down, homelab off, home internet out)
+        handle_errors 502 503 504 {
+          import offline_page
         }
       }
     '';
