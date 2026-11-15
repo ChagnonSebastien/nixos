@@ -75,6 +75,9 @@ in
         reverse_proxy https://10.8.0.2:24443 {
           # Same visitor-IP headers Cloudflare sent; `header_up` overwrites any the visitor supplies.
           # X-Forwarded-For/-Proto/-Host are set by Caddy itself.
+          # Caddy defaults Host to the upstream address for HTTPS upstreams; the homelab
+          # Caddy routes on Host and returns 421 when it differs from the SNI.
+          header_up Host {http.request.host}
           header_up CF-Connecting-IP {remote_host}
           header_up X-Real-IP {remote_host}
           transport http {
