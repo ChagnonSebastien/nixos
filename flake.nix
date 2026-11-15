@@ -86,6 +86,16 @@
             }
           ];
         };
+
+      mkMinimal = name: extraModules:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = extraModules ++ [
+            ./modules/base.nix
+            ./hosts/${name}
+            { networking.hostName = name; }
+          ];
+        };
     in {
       nixosConfigurations = builtins.mapAttrs mkHost {
         desktop.channel  = unstable;
@@ -95,16 +105,10 @@
           channel      = stable;
           extraModules = [ nixos-wsl.nixosModules.default ];
         };
-      } // {
-        # Deliberately outside mkHost: no home-manager, docker or nvidia, so it stays small.
-        vps = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [ disko.nixosModules.disko ./hosts/vps ];
-        };
-        homelab-rescue = nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [ ./hosts/homelab-rescue ];
-        };
+      } // builtins.mapAttrs mkMinimal {
+        # Deliberately outside mkHost: no home-manager, docker or nvidia, so they stay small.
+        vps            = [ disko.nixosModules.disko ];
+        homelab-rescue = [ ];
       };
     };
 }

@@ -44,10 +44,13 @@ home/
   desktop-environment/ per-desktop home-manager config
 ```
 
-Every host gets these from `mkHost`:
+Every `mkHost` host gets these:
 
-- **NixOS:** `common.nix`, `shell.nix`, `cli-tools.nix`, `fonts.nix`
+- **NixOS:** `common.nix` (which imports `base.nix`), `shell.nix`, `cli-tools.nix`, `fonts.nix`
 - **home-manager:** `shell.nix`, `nvim.nix`, `git.nix`
+
+`vps` and `homelab-rescue` use `mkMinimal` instead: only `base.nix` (flakes, nix gc,
+timezone) and the hostname, no home-manager.
 
 Each channel (`stable` = nixos-26.05, `unstable` = nixos-unstable) pins nixpkgs,
 home-manager and nixvim together, and each host picks one channel.

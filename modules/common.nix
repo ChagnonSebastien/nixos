@@ -1,22 +1,14 @@
 { ... }:
 
 {
-  nix = {
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 14d";
-    };
+  imports = [ ./base.nix ];
 
-    settings.experimental-features = [ "nix-command" "flakes" ];
-    settings.auto-optimise-store = true;
-  };
+  nix.settings.auto-optimise-store = true;
 
   nixpkgs.config.allowUnfree = true;
 
   programs.nix-ld.enable = true;
 
-  time.timeZone = "America/Montreal";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "en_CA.UTF-8";

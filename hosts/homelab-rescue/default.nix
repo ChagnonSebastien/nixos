@@ -28,7 +28,6 @@ in
   };
 
   networking = {
-    hostName = "homelab-rescue";
     useDHCP = false;
     interfaces.${net.homelab.lanInterface}.ipv4.addresses = [ { address = net.homelab.lanIp; inherit (net.lan) prefixLength; } ];
     defaultGateway = net.lan.gateway;
@@ -52,8 +51,6 @@ in
     e2fsprogs gptfdisk parted btrfs-progs smartmontools efibootmgr rsync tmux vim
   ];
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  time.timeZone = "America/Montreal";
   documentation.enable = false;
 
   system.stateVersion = "26.05";
