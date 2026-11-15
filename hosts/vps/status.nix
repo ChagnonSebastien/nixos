@@ -35,6 +35,12 @@ in
           .space-y-6:has(> .endpoint-group) { display: flex; flex-direction: column; gap: 1.5rem; }
           .space-y-6 > .endpoint-group { margin-top: 0 !important; }
           .endpoint-group:has([title="Server online"]) { order: -1; }
+          /* flat view: Gatus puts suites in their own section; fold both sections into one grid */
+          div:has(> div > .grid > .suite) { display: grid; gap: 0.75rem; grid-template-columns: minmax(0, 1fr); }
+          @media (min-width: 640px) { div:has(> div > .grid > .suite) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+          @media (min-width: 1024px) { div:has(> div > .grid > .suite) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+          div:has(> div > .grid > .suite) > div, div:has(> div > .grid > .suite) > div > .grid { display: contents; }
+          div:has(> div > .grid > .suite) > div > h2, .endpoint-group-content h3 { display: none; }
         '';
       };
       endpoints = [
@@ -50,10 +56,20 @@ in
         (site "Authentication services" "https://auth.chagnon.dev/realms/master" [ "[STATUS] == 200" "[BODY].realm == master" ])
         (site "Fintrospect" "https://fintrospect.chagnon.dev/" [ "[STATUS] == 200" ])
         (site "Immich" "https://immich.chagnon.dev/api/server/ping" [ "[STATUS] == 200" "[BODY].res == pong" ])
-        (siteIn "Sebflix" "Jellyseerr" "https://jellyseerr.chagnon.dev/api/v1/status" [ "[STATUS] == 200" ])
         (site "Office" "https://office.chagnon.dev/status.php" [ "[STATUS] == 200" "[BODY].maintenance == false" ])
-        (siteIn "Sebflix" "Sebflix" "https://sebflix.chagnon.dev/health" [ "[STATUS] == 200" "[BODY] == Healthy" ])
         (site "Vault" "https://vault.chagnon.dev/alive" [ "[STATUS] == 200" ])
+      ];
+      # One card for Sebflix and its request site: red if either check fails.
+      suites = [
+        {
+          name = "Sebflix";
+          group = "Services";
+          interval = "1m";
+          endpoints = [
+            (removeAttrs (site "Streaming" "https://sebflix.chagnon.dev/health" [ "[STATUS] == 200" "[BODY] == Healthy" ]) [ "group" "interval" ])
+            (removeAttrs (site "Requests" "https://jellyseerr.chagnon.dev/api/v1/status" [ "[STATUS] == 200" ]) [ "group" "interval" ])
+          ];
+        }
       ];
     };
   };
