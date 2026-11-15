@@ -16,7 +16,57 @@ in
   boot.kernel.sysctl."net.ipv4.ip_unprivileged_port_start" = "80";
   boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
 
-  networking.firewall.enable = false;
+  # Opens everything that listened on 2026-11-15, so LAN and wg-home reach exactly what they did.
+  # Trap: Docker-published ports are DNATed through FORWARD and never hit these rules; removing
+  # one here does not close it (bind it to 127.0.0.1 in compose, or filter in DOCKER-USER).
+  networking.firewall =
+    let
+      lanAndVpn = {
+        allowedTCPPorts = [
+          22 # sshd
+          53 # pi-hole DNS
+          8096 # jellyfin
+          8200 # transmission container
+          9091 # transmission RPC
+          9100 # node-exporter
+          18888 # vcclient
+          24004 # pi-hole web
+          24006 # phpldapadmin
+          24020 # radarr
+          24021 # prowlarr
+          24022 # sonarr
+          24024 # bazarr
+          24026 # jellyseerr
+          24030 # grafana
+          24031 # victoriametrics
+          24080 # caddy http
+          net.homelab.caddyPort
+        ];
+        allowedUDPPorts = [
+          53 # pi-hole DNS
+          123 # pi-hole NTP
+          net.homelab.caddyPort # caddy HTTP/3
+          net.homelab.wgHomePort
+        ];
+      };
+    in
+    {
+      enable = true;
+      # containers reach host-network services (pi-hole DNS, node-exporter) and docker-proxy hairpins
+      trustedInterfaces = [ "docker0" "br-+" ];
+      # never ran with rpfilter; wg-home and the VPS relay were only tested without it
+      checkReversePath = false;
+      interfaces = {
+        ${net.homelab.lanInterface} = lanAndVpn;
+        wg-home = lanAndVpn;
+        # mirrors wg-vps-in; wg-vps's own outer UDP has no fixed port and passes as ESTABLISHED
+        # because the homelab always dials out with a keepalive
+        wg-vps = {
+          allowedTCPPorts = [ net.homelab.caddyPort ];
+          allowedUDPPorts = [ net.homelab.wgHomePort ];
+        };
+      };
+    };
 
   networking.networkmanager.enable = false;
   networking.useDHCP = false;
