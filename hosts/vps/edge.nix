@@ -34,7 +34,8 @@ in
 {
   networking.firewall = {
     allowedTCPPorts = [ 80 443 ];
-    allowedUDPPorts = [ 51820 ];
+    # 443/udp: HTTP/3 (QUIC) to visitors; Caddy already listens and advertises it via Alt-Svc
+    allowedUDPPorts = [ 443 51820 ];
   };
 
   networking.wireguard.interfaces.wg-vps = {
