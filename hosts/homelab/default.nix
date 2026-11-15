@@ -46,6 +46,8 @@ in
     # if missing a fresh key is generated and every peer must be reconfigured
     privateKeyFile = "/var/lib/wireguard/wg-home.key";
     generatePrivateKeyFile = true;
+    # peer IPs are the Proton-assigned addresses on purpose: each client runs one interface
+    # with a homelab peer (192.168.0.0/24) and a Proton peer (the rest), so do not renumber
     peers = [
       {
         publicKey = "T4pPomAl7cPP/LVBcHvxjzSRqYJb/ZpPxnBlObZ710o=";
