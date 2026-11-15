@@ -25,7 +25,6 @@
     prismlauncher
     obsidian
     onlyoffice-desktopeditors
-    tagstudio
   ];
 
   xdg.mimeApps.defaultApplications = {
