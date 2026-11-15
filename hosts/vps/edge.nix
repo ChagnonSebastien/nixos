@@ -118,6 +118,9 @@ in
           header_up Host {http.request.host}
           header_up CF-Connecting-IP {remote_host}
           header_up X-Real-IP {remote_host}
+          # Keep WebSockets and streams (Jellyfin playback, live updates) open for up to 5 min
+          # when Caddy reloads, so a deploy doesn't kick viewers out mid-video.
+          stream_close_delay 5m
           transport http {
             # SNI = requested host, so the homelab picks and we verify the right certificate
             tls_server_name {http.request.host}
