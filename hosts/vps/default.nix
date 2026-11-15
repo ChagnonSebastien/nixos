@@ -25,8 +25,10 @@
   services.openssh = {
     enable = true;
     settings = {
-      # Passwords are allowed for seb only (set by root with `passwd seb`); root is key-only.
-      PasswordAuthentication = true;
+      # keys only, for every user (bots try ~75 password guesses an hour); seb's password
+      # still works for sudo and the OVH console
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
       PermitRootLogin = "prohibit-password";
     };
   };
