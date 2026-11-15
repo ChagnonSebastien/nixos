@@ -6,6 +6,7 @@
     ./metrics.nix
     ./status.nix
     ./vpn-relay.nix
+    ./crowdsec.nix
   ];
 
   # Boots via SeaBIOS (EF02 partition); the ESP is kept so a switch to UEFI just works.
