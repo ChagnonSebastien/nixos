@@ -36,6 +36,9 @@
   networking.wireguard.interfaces.wg-home = {
     ips = [ "10.7.0.1/24" ];
     listenPort = 51821;
+    # clients arrive relayed through the VPS (hosts/vps/vpn-relay.nix), i.e. WireGuard inside
+    # WireGuard; 1280 leaves room for both headers on any network
+    mtu = 1280;
     # if missing a fresh key is generated and every peer must be reconfigured
     privateKeyFile = "/var/lib/wireguard/wg-home.key";
     generatePrivateKeyFile = true;
@@ -52,11 +55,11 @@
   };
 
   # Tunnel to the VPS edge (hosts/vps/edge.nix). We dial out to its fixed IP, so a new home
-  # IP needs no reporting and no port forward. The VPS is treated as untrusted: the
-  # wg-vps-in chain lets it open connections only to Caddy (10.8.0.2:24443, the caddy
-  # container's published 443, which also
-  # demands the VPS client cert), never to other ports here or to the LAN. It sits in
-  # mangle PREROUTING so it runs before Docker's DNAT and before routing/forwarding.
+  # IP needs no reporting and no port forward. The VPS is treated as untrusted: the wg-vps-in
+  # chain lets it open connections only to Caddy (10.8.0.2:24443, the caddy container's
+  # published 443, which also demands the VPS client cert) and to the relayed wg-home VPN
+  # port (51821/udp), never to other ports here or to the LAN. It sits in mangle PREROUTING
+  # so it runs before Docker's DNAT and before routing/forwarding.
   networking.wireguard.interfaces.wg-vps = {
     ips = [ "10.8.0.2/24" ];
     # if missing a fresh key is generated and the VPS peer must be updated
@@ -74,6 +77,8 @@
       ${pkgs.iptables}/bin/iptables -t mangle -N wg-vps-in 2>/dev/null || ${pkgs.iptables}/bin/iptables -t mangle -F wg-vps-in
       ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -m conntrack --ctstate ESTABLISHED,RELATED -j RETURN
       ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d 10.8.0.2 -p tcp --dport 24443 -m conntrack --ctstate NEW -j RETURN
+      # relayed wg-home VPN clients; WireGuard drops anything not signed by a client key
+      ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -d 10.8.0.2 -p udp --dport 51821 -m conntrack --ctstate NEW -j RETURN
       ${pkgs.iptables}/bin/iptables -t mangle -A wg-vps-in -j DROP
       ${pkgs.iptables}/bin/iptables -t mangle -C PREROUTING -i wg-vps -j wg-vps-in 2>/dev/null || \
         ${pkgs.iptables}/bin/iptables -t mangle -I PREROUTING -i wg-vps -j wg-vps-in
