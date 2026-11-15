@@ -187,7 +187,7 @@ in
   systemd.services.docker.after = [ "nvidia-container-toolkit-cdi-generator.service" ];
 
   users.users.seb = {
-    extraGroups = [ "docker" "k3s" ];
+    extraGroups = [ "docker" ];
     linger = true;
   };
 
