@@ -14,6 +14,18 @@
     wgHomePort = 51821;
   };
 
+  # Phones and laptops: one WireGuard interface with two peers, the homelab via the VPS relay
+  # (192.168.0.0/24) and the VPS exit (everything else), so each client keeps one IP on both.
+  roaming = {
+    homelabIp = "10.7.0.1";
+    prefixLength = 24;
+    exitPort = 51822;
+    clients = [
+      { publicKey = "T4pPomAl7cPP/LVBcHvxjzSRqYJb/ZpPxnBlObZ710o="; ip = "10.7.0.2"; }
+      { publicKey = "n90nNFBkbpqHjeHAKSIwZfEiahtkNLzykQwTvS/c8j8="; ip = "10.7.0.3"; }
+    ];
+  };
+
   vps = {
     ipv4 = "198.245.55.120";
     ipv6 = "2607:5300:205:200::fccc";

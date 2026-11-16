@@ -9,6 +9,7 @@ in
     ./metrics.nix
     ./status.nix
     ./vpn-relay.nix
+    ./vpn-exit.nix
     ./crowdsec.nix
   ];
 

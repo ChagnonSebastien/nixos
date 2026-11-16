@@ -89,7 +89,7 @@ in
   };
 
   networking.wireguard.interfaces.wg-home = {
-    ips = [ "10.7.0.1/24" ];
+    ips = [ "${net.roaming.homelabIp}/${toString net.roaming.prefixLength}" ];
     listenPort = net.homelab.wgHomePort;
     # clients arrive relayed through the VPS (hosts/vps/vpn-relay.nix), i.e. WireGuard inside
     # WireGuard; 1280 leaves room for both headers on any network
@@ -97,18 +97,11 @@ in
     # if missing a fresh key is generated and every peer must be reconfigured
     privateKeyFile = "/var/lib/wireguard/wg-home.key";
     generatePrivateKeyFile = true;
-    # peer IPs are the Proton-assigned addresses on purpose: each client runs one interface
-    # with a homelab peer (192.168.0.0/24) and a Proton peer (the rest), so do not renumber
-    peers = [
-      {
-        publicKey = "T4pPomAl7cPP/LVBcHvxjzSRqYJb/ZpPxnBlObZ710o=";
-        allowedIPs = [ "10.2.0.2/32" ];
-      }
-      {
-        publicKey = "n90nNFBkbpqHjeHAKSIwZfEiahtkNLzykQwTvS/c8j8=";
-        allowedIPs = [ "10.2.0.3/32" ];
-      }
-    ];
+    # the VPS exit (hosts/vps/vpn-exit.nix) knows the same clients by the same IPs
+    peers = map (c: {
+      inherit (c) publicKey;
+      allowedIPs = [ "${c.ip}/32" ];
+    }) net.roaming.clients;
   };
 
   # Tunnel to the VPS edge (hosts/vps/edge.nix). We dial out to its fixed IP, so a new home
