@@ -10,6 +10,10 @@
     ntfs3g
     unzip
     jq
+    # editing ~/nixos-secrets
+    sops
+    age
+    ssh-to-age
   ];
 
   programs = {
