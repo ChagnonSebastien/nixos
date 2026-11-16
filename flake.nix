@@ -28,9 +28,18 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # private: sops-encrypted files only (.sops.yaml there lists who can open each)
+    secrets = {
+      url = "git+ssh://git@github.com/ChagnonSebastien/nixos-secrets.git";
+      flake = false;
+    };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, disko, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, disko, sops-nix, secrets, ... }:
     let
       system = "x86_64-linux";
 
@@ -114,7 +123,11 @@
         };
       } // builtins.mapAttrs mkMinimal {
         # Deliberately outside mkHost: no home-manager, docker or nvidia, so they stay small.
-        vps            = [ disko.nixosModules.disko ];
+        vps = [
+          disko.nixosModules.disko
+          sops-nix.nixosModules.sops
+          { sops.defaultSopsFile = "${secrets}/vps.yaml"; }
+        ];
         homelab-rescue = [ ];
       };
     };

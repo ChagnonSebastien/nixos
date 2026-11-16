@@ -1,9 +1,9 @@
 # Keeps wg-upstream on the fastest server among the WireGuard client configs in
-# $STATE_DIR/servers/*.conf (standard wg-quick files: PrivateKey, Address, PublicKey, Endpoint).
+# $SERVERS_DIR/*.conf (standard wg-quick files: PrivateKey, Address, PublicKey, Endpoint).
 # Usage: vpn-exit setup | check | select | teardown
-# Env (set by vpn-exit.nix): STATE_DIR TABLE CLIENT_IF PROBE_TARGET
+# Env (set by vpn-exit.nix): SERVERS_DIR STATE_DIR TABLE CLIENT_IF PROBE_TARGET
 
-servers="$STATE_DIR/servers"
+servers="$SERVERS_DIR"
 active_file="$STATE_DIR/active"
 last_select_file="$STATE_DIR/last-select"
 probe_ns=vpn-exit-probe
@@ -122,8 +122,6 @@ setup() {
   ip rule del pref 1000 2> /dev/null || true
   ip rule add pref 1000 iif "$CLIENT_IF" lookup "$TABLE"
   ip netns add "$probe_ns" 2> /dev/null || true
-  mkdir -p "$servers"
-  chmod 700 "$servers"
   : > "$active_file"
   rm -f "$last_select_file"
 }

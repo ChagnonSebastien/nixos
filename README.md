@@ -26,7 +26,24 @@ On a fresh install, or to build another host, name it explicitly:
 sudo nixos-rebuild switch --flake .#<host>
 ```
 
-Update inputs with `nix flake update`.
+`vps` and `homelab` read secrets from the private `nixos-secrets` input, which only this
+machine can fetch, so deploy them from here instead of on the host:
+
+```sh
+nixos-rebuild switch --flake .#vps --target-host root@198.245.55.120
+nixos-rebuild switch --flake .#homelab --target-host seb@192.168.0.2 --ask-sudo-password
+```
+
+Update inputs with `nix flake update`; after committing to `nixos-secrets`, `nix flake update secrets`.
+
+## Secrets
+
+`nixos-secrets` (private) holds sops-encrypted YAML, one file per host, each openable by
+two keys: mine (`~/.config/sops/age/keys.txt`, backed up off this machine) and the host's
+SSH host key, which sops-nix uses at activation to write the values to `/run`. Edit with
+`sops edit <host>.yaml` in that repo; `.sops.yaml` there lists who can open each file. A
+reinstalled host has a new host key: put its `ssh-to-age` output in `.sops.yaml`, then
+`sops updatekeys <host>.yaml`.
 
 `nix flake check` runs the tests of the homelab's bulk pool consolidator.
 

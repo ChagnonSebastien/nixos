@@ -4,16 +4,19 @@
 #   phone ──WireGuard, relayed by vpn-relay.nix──▶ homelab wg-home  (192.168.0.0/24 only)
 #
 # LAN traffic never decrypts here; internet traffic does, before it enters the upstream VPN.
-# vpn-exit.sh keeps wg-upstream on the fastest server among the wg-quick client configs in
-# /var/lib/vpn-exit/servers/*.conf (one per server, root-only), taking its Address from the
-# active config; clients keep their 10.7.0.x and are masqueraded behind it.
-{ pkgs, ... }:
+# vpn-exit.sh keeps wg-upstream on the fastest server among the wg-quick client configs listed
+# in `servers`, taking its Address from the active config; clients keep their 10.7.0.x and are
+# masqueraded behind it. Each config is stored whole in the secrets repo's vps.yaml under
+# `vpn-exit-<name>` (`sops edit vps.yaml` there).
+{ config, lib, pkgs, ... }:
 let
   net = import ../../lib/network.nix;
   r = net.roaming;
   wan = net.vps.wanInterface;
   table = "51822";
   stateDir = "/var/lib/vpn-exit";
+  serversDir = "/run/vpn-exit/servers";
+  servers = [ ];
 
   vpn-exit = pkgs.writeShellApplication {
     name = "vpn-exit";
@@ -21,6 +24,7 @@ let
     text = builtins.readFile ./vpn-exit.sh;
   };
   env = {
+    SERVERS_DIR = serversDir;
     STATE_DIR = stateDir;
     TABLE = table;
     CLIENT_IF = "wg-exit";
@@ -30,15 +34,20 @@ in
 {
   environment.systemPackages = [ vpn-exit ];
 
+  sops.secrets = {
+    wg-exit = { };
+  } // lib.genAttrs (map (n: "vpn-exit-${n}") servers) (name: {
+    path = "${serversDir}/${lib.removePrefix "vpn-exit-" name}.conf";
+  });
+
   networking.firewall.allowedUDPPorts = [ r.exitPort ];
 
   networking.wireguard.interfaces.wg-exit = {
     ips = [ "10.7.0.254/32" ];
     listenPort = r.exitPort;
     mtu = 1420;
-    # create before deploying: `(umask 077; wg genkey > /var/lib/wireguard/wg-exit.key)`;
     # clients need `sudo wg show wg-exit public-key`
-    privateKeyFile = "/var/lib/wireguard/wg-exit.key";
+    privateKeyFile = config.sops.secrets.wg-exit.path;
     peers = map (c: {
       inherit (c) publicKey;
       allowedIPs = [ "${c.ip}/32" ];
