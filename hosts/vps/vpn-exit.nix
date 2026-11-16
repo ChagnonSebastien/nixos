@@ -4,10 +4,12 @@
 #   phone ──WireGuard, relayed by vpn-relay.nix──▶ homelab wg-home  (192.168.0.0/24 only)
 #
 # LAN traffic never decrypts here; internet traffic does, before it enters the upstream VPN.
-# vpn-exit.sh keeps wg-upstream on the fastest of `servers`; clients keep their 10.7.0.x and
-# are masqueraded behind `address`. Two account keys from the secrets repo's vps.yaml serve
-# every server: one for the live tunnel, one for testing candidates. Neither may be used on
-# any other device, since a key used twice drops its older connection.
+# vpn-exit.sh keeps wg-upstream on the fastest of a few candidates; clients keep their 10.7.0.x
+# and are masqueraded behind `address`. Candidates are the best-scored servers from vpn-exit-api
+# (Proton's own client libraries, logged in once with `sudo -u vpn-exit-api vpn-exit-api login`)
+# while its list is fresh, else `staticServers`. Two account keys from the secrets repo's
+# vps.yaml serve every server: one for the live tunnel, one for testing candidates. Neither may
+# be used on any other device, since a key used twice drops its older connection.
 { config, pkgs, lib, ... }:
 let
   net = import ../../lib/network.nix;
@@ -15,17 +17,26 @@ let
   wan = net.vps.wanInterface;
   table = "51822";
   stateDir = "/var/lib/vpn-exit";
+  apiStateDir = "/var/lib/vpn-exit-api";
+  textfileDir = "/var/lib/prometheus-node-exporter-text";
 
   # the tunnel address the provider assigns to every key
   address = "10.2.0.2";
-  # endpoint and public key are in any config downloaded for that server
-  servers = [
+  # fallback when the API list is missing or stale; endpoint and public key are in any config
+  # downloaded for that server
+  staticServers = [
     { name = "ca-1212"; endpoint = "84.20.16.29:51820"; publicKey = "uUM9J8bziO0yZfsdYoruEfP3m6YuSu+Mek9W/J8mT1Y="; }
     { name = "ca-589"; endpoint = "104.254.95.98:51820"; publicKey = "SFesR+3u5/vyQGeaCSREjs4m2WznwFlWAQ9CE3QSnRg="; }
   ];
-  serversFile = pkgs.writeText "vpn-exit-servers" (
-    lib.concatMapStrings (s: "${s.name} ${s.endpoint} ${s.publicKey}\n") servers
+  staticServersFile = pkgs.writeText "vpn-exit-servers" (
+    lib.concatMapStrings (s: "${s.name} ${s.endpoint} ${s.publicKey}\n") staticServers
   );
+
+  vpn-exit-api = pkgs.writers.writePython3Bin "vpn-exit-api" {
+    # packaging: imported by proton-vpn-api-core but missing from its nixpkgs dependencies
+    libraries = with pkgs.python3Packages; [ proton-vpn-api-core packaging ];
+    flakeIgnore = [ "E501" ];
+  } (builtins.readFile ./vpn-exit-api.py);
 
   vpn-exit = pkgs.writeShellApplication {
     name = "vpn-exit";
@@ -33,7 +44,11 @@ let
     text = builtins.readFile ./vpn-exit.sh;
   };
   env = {
-    SERVERS_FILE = serversFile;
+    STATIC_SERVERS_FILE = staticServersFile;
+    API_SERVERS_FILE = "${apiStateDir}/servers";
+    API_MAX_AGE = "3600";
+    API_CANDIDATES = "5";
+    METRICS_FILE = "${textfileDir}/vpn-exit.prom";
     LIVE_KEY = config.sops.secrets.vpn-exit-live-key.path;
     PROBE_KEY = config.sops.secrets.vpn-exit-probe-key.path;
     ADDRESS = address;
@@ -44,7 +59,7 @@ let
   };
 in
 {
-  environment.systemPackages = [ vpn-exit ];
+  environment.systemPackages = [ vpn-exit vpn-exit-api ];
 
   sops.secrets = {
     wg-exit = { };
@@ -123,5 +138,48 @@ in
       OnUnitActiveSec = "2min";
       OnBootSec = "2min";
     };
+  };
+
+  users.users.vpn-exit-api = {
+    isSystemUser = true;
+    group = "vpn-exit-api";
+    home = apiStateDir;
+  };
+  users.groups.vpn-exit-api = { };
+
+  systemd.services.vpn-exit-api = {
+    description = "Refresh the VPN exit's server list and loads from the provider API";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    # gpg verifies the SRP modulus during login and refresh
+    path = [ pkgs.gnupg ];
+    environment.STATE_DIR = apiStateDir;
+    serviceConfig = {
+      Type = "oneshot";
+      User = "vpn-exit-api";
+      Group = "vpn-exit-api";
+      StateDirectory = "vpn-exit-api";
+      StateDirectoryMode = "0755";
+      ExecStart = "${vpn-exit-api}/bin/vpn-exit-api update";
+      NoNewPrivileges = true;
+      ProtectSystem = "strict";
+      ProtectHome = true;
+      PrivateTmp = true;
+    };
+  };
+  systemd.timers.vpn-exit-api = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "1min";
+      # the official client refreshes loads every 15 min with jitter
+      OnUnitActiveSec = "15min";
+      RandomizedDelaySec = "3min";
+    };
+  };
+
+  systemd.tmpfiles.rules = [ "d ${textfileDir} 0755 root root -" ];
+  services.prometheus.exporters.node = {
+    enabledCollectors = [ "textfile" ];
+    extraFlags = [ "--collector.textfile.directory=${textfileDir}" ];
   };
 }

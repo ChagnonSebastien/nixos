@@ -1,11 +1,16 @@
-# Keeps wg-upstream on the fastest server listed in $SERVERS_FILE (lines: name endpoint publickey).
+# Keeps wg-upstream on the fastest of a few candidate servers (lines: name endpoint publickey).
+# Candidates are the best-scored entries of $API_SERVERS_FILE while vpn-exit-api keeps it fresh,
+# else $STATIC_SERVERS_FILE, so the provider's API can break without taking the exit down.
 # The live tunnel uses $LIVE_KEY and candidates are tested with $PROBE_KEY: a provider may allow
 # one connection per key, and testing with the live key would cut the live tunnel.
 # Usage: vpn-exit setup | check | select | teardown
-# Env (set by vpn-exit.nix): SERVERS_FILE LIVE_KEY PROBE_KEY ADDRESS STATE_DIR TABLE CLIENT_IF PROBE_TARGET
+# Env (set by vpn-exit.nix): STATIC_SERVERS_FILE API_SERVERS_FILE API_MAX_AGE API_CANDIDATES
+#   LIVE_KEY PROBE_KEY ADDRESS STATE_DIR METRICS_FILE TABLE CLIENT_IF PROBE_TARGET
 
 active_file="$STATE_DIR/active"
 last_select_file="$STATE_DIR/last-select"
+last_healthy_file="$STATE_DIR/last-healthy"
+last_rtt_file="$STATE_DIR/last-rtt"
 probe_ns=vpn-exit-probe
 reselect_after=1800
 # a better server must beat the active one by both margins, since switching changes the
@@ -29,8 +34,38 @@ warm_up() {
 }
 
 active_rtt() {
+  local rtt
   warm_up ping -I wg-upstream || true
-  { ping "${ping_args[@]}" -I wg-upstream "$PROBE_TARGET" 2> /dev/null || true; } | avg_rtt
+  rtt=$({ ping "${ping_args[@]}" -I wg-upstream "$PROBE_TARGET" 2> /dev/null || true; } | avg_rtt) || return 1
+  date +%s > "$last_healthy_file"
+  echo "$rtt" | tee "$last_rtt_file"
+}
+
+api_age() {
+  local mtime
+  mtime=$(stat -c %Y "$API_SERVERS_FILE" 2> /dev/null) || { echo -1; return; }
+  echo $(($(date +%s) - mtime))
+}
+
+# the active server is always measured, even when it dropped out of the candidates
+candidates() {
+  local age active
+  age=$(api_age)
+  if [ "$age" -ge 0 ] && [ "$age" -le "$API_MAX_AGE" ]; then
+    head -n "$API_CANDIDATES" "$API_SERVERS_FILE" | cut -d' ' -f1-3
+  else
+    if [ "$age" -lt 0 ]; then
+      echo "no provider API data; using the static server list" >&2
+    else
+      echo "provider API data is ${age}s old; using the static server list" >&2
+    fi
+    cat "$STATIC_SERVERS_FILE"
+  fi > "$STATE_DIR/candidates"
+  active=$(cat "$active_file" 2> /dev/null || true)
+  if [ -n "$active" ] && ! grep -q "^${active%% *} " "$STATE_DIR/candidates"; then
+    echo "$active" >> "$STATE_DIR/candidates"
+  fi
+  cat "$STATE_DIR/candidates"
 }
 
 # Brings the candidate up in its own namespace so the probe never touches the live exit;
@@ -55,13 +90,13 @@ switch_to() {
   for p in $(wg show wg-upstream peers); do removals+=(peer "$p" remove); done
   wg set wg-upstream private-key "$LIVE_KEY" "${removals[@]}" \
     peer "$public_key" endpoint "$endpoint" allowed-ips 0.0.0.0/0 persistent-keepalive 25
-  echo "$name" > "$active_file"
+  echo "$name $endpoint $public_key" > "$active_file"
   echo "switched to $name"
 }
 
 select_server() {
   local active best='' best_line='' best_rtt='' rtt active_ms='' name endpoint public_key
-  active=$(cat "$active_file" 2> /dev/null || true)
+  active=$(cut -d' ' -f1 "$active_file" 2> /dev/null || true)
   while read -r name endpoint public_key; do
     [ -n "$name" ] || continue
     if [ "$name" = "$active" ]; then
@@ -75,11 +110,11 @@ select_server() {
     if [ -z "$best" ] || awk -v a="$rtt" -v b="$best_rtt" 'BEGIN { exit !(a < b) }'; then
       best=$name best_line="$name $endpoint $public_key" best_rtt=$rtt
     fi
-  done < "$SERVERS_FILE"
+  done < <(candidates)
   date +%s > "$last_select_file"
 
   if [ -z "$best" ]; then
-    echo "no server in $SERVERS_FILE answered; client traffic is blackholed until one does" >&2
+    echo "no candidate server answered; client traffic is blackholed until one does" >&2
     return 1
   fi
   if [ "$best" = "$active" ]; then
@@ -102,6 +137,37 @@ check() {
     return 0
   fi
   select_server
+}
+
+# node_exporter textfile collector format; written on every run, success or not
+write_metrics() {
+  local active rtt='' healthy tmp
+  active=$(cut -d' ' -f1 "$active_file" 2> /dev/null || true)
+  healthy=$(cat "$last_healthy_file" 2> /dev/null || echo 0)
+  # every run measures the active server, so an older answer means it stopped answering
+  if [ $(($(date +%s) - healthy)) -lt 120 ]; then
+    rtt=$(cat "$last_rtt_file" 2> /dev/null || true)
+  fi
+  tmp=$(mktemp "$METRICS_FILE.XXXXXX")
+  {
+    echo "# HELP vpn_exit_up Whether the active upstream server answers through the live tunnel."
+    echo "# TYPE vpn_exit_up gauge"
+    if [ -n "$rtt" ]; then echo "vpn_exit_up 1"; else echo "vpn_exit_up 0"; fi
+    echo "# HELP vpn_exit_active_rtt_seconds Round trip to the probe target through the live tunnel."
+    echo "# TYPE vpn_exit_active_rtt_seconds gauge"
+    [ -n "$rtt" ] && awk -v r="$rtt" 'BEGIN { printf "vpn_exit_active_rtt_seconds %.6f\n", r / 1000 }'
+    echo "# HELP vpn_exit_last_healthy_timestamp_seconds Last time the live tunnel answered."
+    echo "# TYPE vpn_exit_last_healthy_timestamp_seconds gauge"
+    echo "vpn_exit_last_healthy_timestamp_seconds $healthy"
+    echo "# HELP vpn_exit_api_servers_age_seconds Age of the provider API server list, -1 when missing."
+    echo "# TYPE vpn_exit_api_servers_age_seconds gauge"
+    echo "vpn_exit_api_servers_age_seconds $(api_age)"
+    echo "# HELP vpn_exit_active_server The active upstream server."
+    echo "# TYPE vpn_exit_active_server gauge"
+    [ -n "$active" ] && echo "vpn_exit_active_server{server=\"$active\"} 1"
+  } > "$tmp"
+  chmod 644 "$tmp"
+  mv "$tmp" "$METRICS_FILE"
 }
 
 setup() {
@@ -129,10 +195,13 @@ teardown() {
   ip netns del "$probe_ns" 2> /dev/null || true
 }
 
+status=0
 case "${1:-}" in
   setup) setup ;;
-  check) check ;;
-  select) select_server ;;
+  check) check || status=$? ;;
+  select) select_server || status=$? ;;
   teardown) teardown ;;
   *) echo "usage: vpn-exit setup|check|select|teardown" >&2; exit 2 ;;
 esac
+case "${1:-}" in check | select) write_metrics ;; esac
+exit "$status"
