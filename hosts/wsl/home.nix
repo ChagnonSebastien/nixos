@@ -17,6 +17,10 @@ in
     icu
     zip
     tinyproxy
+    # editing ~/nixos-secrets
+    sops
+    age
+    ssh-to-age
   ];
 
   programs.git.settings.user.email = "sebastien.chagnon@qohash.com";
