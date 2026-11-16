@@ -4,19 +4,28 @@
 #   phone ──WireGuard, relayed by vpn-relay.nix──▶ homelab wg-home  (192.168.0.0/24 only)
 #
 # LAN traffic never decrypts here; internet traffic does, before it enters the upstream VPN.
-# vpn-exit.sh keeps wg-upstream on the fastest server among the wg-quick client configs listed
-# in `servers`, taking its Address from the active config; clients keep their 10.7.0.x and are
-# masqueraded behind it. Each config is stored whole in the secrets repo's vps.yaml under
-# `vpn-exit-<name>` (`sops edit vps.yaml` there).
-{ config, lib, pkgs, ... }:
+# vpn-exit.sh keeps wg-upstream on the fastest of `servers`; clients keep their 10.7.0.x and
+# are masqueraded behind `address`. Two account keys from the secrets repo's vps.yaml serve
+# every server: one for the live tunnel, one for testing candidates. Neither may be used on
+# any other device, since a key used twice drops its older connection.
+{ config, pkgs, lib, ... }:
 let
   net = import ../../lib/network.nix;
   r = net.roaming;
   wan = net.vps.wanInterface;
   table = "51822";
   stateDir = "/var/lib/vpn-exit";
-  serversDir = "/run/vpn-exit/servers";
-  servers = [ ];
+
+  # the tunnel address the provider assigns to every key
+  address = "10.2.0.2";
+  # endpoint and public key are in any config downloaded for that server
+  servers = [
+    { name = "ca-1212"; endpoint = "84.20.16.29:51820"; publicKey = "uUM9J8bziO0yZfsdYoruEfP3m6YuSu+Mek9W/J8mT1Y="; }
+    { name = "ca-589"; endpoint = "104.254.95.98:51820"; publicKey = "SFesR+3u5/vyQGeaCSREjs4m2WznwFlWAQ9CE3QSnRg="; }
+  ];
+  serversFile = pkgs.writeText "vpn-exit-servers" (
+    lib.concatMapStrings (s: "${s.name} ${s.endpoint} ${s.publicKey}\n") servers
+  );
 
   vpn-exit = pkgs.writeShellApplication {
     name = "vpn-exit";
@@ -24,7 +33,10 @@ let
     text = builtins.readFile ./vpn-exit.sh;
   };
   env = {
-    SERVERS_DIR = serversDir;
+    SERVERS_FILE = serversFile;
+    LIVE_KEY = config.sops.secrets.vpn-exit-live-key.path;
+    PROBE_KEY = config.sops.secrets.vpn-exit-probe-key.path;
+    ADDRESS = address;
     STATE_DIR = stateDir;
     TABLE = table;
     CLIENT_IF = "wg-exit";
@@ -36,9 +48,9 @@ in
 
   sops.secrets = {
     wg-exit = { };
-  } // lib.genAttrs (map (n: "vpn-exit-${n}") servers) (name: {
-    path = "${serversDir}/${lib.removePrefix "vpn-exit-" name}.conf";
-  });
+    vpn-exit-live-key = { };
+    vpn-exit-probe-key = { };
+  };
 
   networking.firewall.allowedUDPPorts = [ r.exitPort ];
 
