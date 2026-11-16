@@ -227,7 +227,45 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "nixvim": "nixvim",
-        "nixvim-unstable": "nixvim-unstable"
+        "nixvim-unstable": "nixvim-unstable",
+        "secrets": "secrets",
+        "sops-nix": "sops-nix"
+      }
+    },
+    "secrets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794873489,
+        "narHash": "sha256-FrX8PUNXoTky+bIFuoX9JhLzU7iOE4UAun/DP5ejAQo=",
+        "ref": "refs/heads/main",
+        "rev": "81e2ed76b46294552840c20cbf2050c6a669d625",
+        "revCount": 2,
+        "type": "git",
+        "url": "ssh://git@github.com/ChagnonSebastien/nixos-secrets.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/ChagnonSebastien/nixos-secrets.git"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794624949,
+        "narHash": "sha256-3q/hxp/flW1PnV3Dx+H3p8kHGEHJ7251BqVMNsAAB9E=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "11e5885d241743ff0193465d533b20e754bc3ce0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "type": "github"
       }
     },
     "systems": {
