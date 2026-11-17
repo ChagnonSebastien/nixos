@@ -2,7 +2,7 @@
 # homelab or the tunnel is down. Service checks go through the public URLs (VPS Caddy →
 # wg-vps → homelab Caddy → app), i.e. exactly what a visitor gets; the Server check tells
 # a tunnel outage apart from a single service being down. Names are for end users.
-{ lib, ... }:
+{ config, lib, ... }:
 let
   net = import ../../lib/network.nix;
 
@@ -22,9 +22,26 @@ let
   '') services;
 in
 {
+  sops.templates.gatus-env.content = ''
+    NTFY_ALERT_TOKEN=${config.sops.placeholder.ntfy-alert-token}
+  '';
+
   services.gatus = {
     enable = true;
+    environmentFile = config.sops.templates.gatus-env.path;
     settings = {
+      alerting.ntfy = {
+        url = "http://127.0.0.1:2586";
+        topic = "alerts";
+        token = "$NTFY_ALERT_TOKEN";
+        priority = 4;
+        click = "https://status.chagnon.dev";
+        default-alert = {
+          failure-threshold = 3;
+          success-threshold = 2;
+          send-on-resolved = true;
+        };
+      };
       web = {
         address = "127.0.0.1";
         port = 8080;
@@ -56,12 +73,14 @@ in
           url = "tcp://${net.wgVps.homelab.ip}:${toString net.homelab.caddyPort}";
           interval = "30s";
           conditions = [ "[CONNECTED] == true" ];
+          alerts = [ { type = "ntfy"; } ];
         }
       ] ++ map (s: {
         inherit (s) name url;
         group = "Services";
         interval = "1m";
         conditions = s.conditions ++ [ "[RESPONSE_TIME] < 5000" ];
+        alerts = [ { type = "ntfy"; } ];
       }) services;
     };
   };

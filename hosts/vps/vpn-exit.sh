@@ -6,6 +6,7 @@
 # Usage: vpn-exit setup | check | select | teardown
 # Env (set by vpn-exit.nix): STATIC_SERVERS_FILE API_SERVERS_FILE API_MAX_AGE API_CANDIDATES
 #   LIVE_KEY PROBE_KEY ADDRESS STATE_DIR METRICS_FILE TABLE CLIENT_IF PROBE_TARGET
+#   NTFY_URL NTFY_TOKEN_FILE
 
 active_file="$STATE_DIR/active"
 last_select_file="$STATE_DIR/last-select"
@@ -172,6 +173,37 @@ write_metrics() {
   mv "$tmp" "$METRICS_FILE"
 }
 
+notify() {
+  local priority=$1 title=$2 message=$3
+  curl -fsS -m 10 -o /dev/null -H "Authorization: Bearer $(cat "$NTFY_TOKEN_FILE")" \
+    -H "Title: $title" -H "Priority: $priority" -H "Tags: vpn-exit" -d "$message" "$NTFY_URL"
+}
+
+# notifies on transitions only; a marker file means "alert sent", so a failed send retries next run
+alert() {
+  local name=$1 failing=$2 title=$3 message=$4 marker="$STATE_DIR/alerted-$1"
+  if [ "$failing" = 1 ] && [ ! -e "$marker" ]; then
+    notify high "$title" "$message" && touch "$marker"
+  elif [ "$failing" = 0 ] && [ -e "$marker" ]; then
+    notify default "Resolved: $title" "Recovered." && rm -f "$marker"
+  fi
+}
+
+alerts() {
+  local healthy age api_error exit_error down=0 stale=0
+  healthy=$(cat "$last_healthy_file" 2> /dev/null || echo 0)
+  [ $(($(date +%s) - healthy)) -ge 300 ] && down=1
+  age=$(api_age)
+  { [ "$age" -lt 0 ] || [ "$age" -gt "$API_MAX_AGE" ]; } && stale=1
+  # the unit's own output, not systemd's "Failed with result" lines
+  api_error=$(journalctl _SYSTEMD_UNIT=vpn-exit-api.service -o cat -n 1 2> /dev/null || true)
+  exit_error=$(journalctl _SYSTEMD_UNIT=vpn-exit-check.service -o cat -n 1 2> /dev/null || true)
+  alert exit "$down" "VPN exit down" \
+    "No upstream server has answered through the live tunnel for 5 min; roaming clients have no internet. Expired or revoked WireGuard keys in vps.yaml look like this. Last output: ${exit_error:-none}" || true
+  alert api "$stale" "VPN exit server list stale" \
+    "vpn-exit-api has not refreshed for over $((API_MAX_AGE / 60)) min, so the exit uses the static list. Last output: ${api_error:-none}. A dead session needs: sudo -u vpn-exit-api vpn-exit-api login" || true
+}
+
 setup() {
   ip link show wg-upstream > /dev/null 2>&1 || ip link add wg-upstream type wireguard
   ip addr replace "$ADDRESS/32" dev wg-upstream
@@ -205,5 +237,5 @@ case "${1:-}" in
   teardown) teardown ;;
   *) echo "usage: vpn-exit setup|check|select|teardown" >&2; exit 2 ;;
 esac
-case "${1:-}" in check | select) write_metrics ;; esac
+case "${1:-}" in check | select) write_metrics; alerts ;; esac
 exit "$status"

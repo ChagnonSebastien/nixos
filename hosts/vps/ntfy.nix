@@ -5,12 +5,14 @@
 #   NTFY_AUTH_USERS=seb:<bcrypt from `ntfy user hash`>:admin
 #   NTFY_AUTH_TOKENS=seb:tk_<29 chars>:homelab
 #   NTFY_AUTH_ACCESS=<user>:<topic>:rw   (only for non-admin users)
+# ntfy-alert-token is one of those tokens, alone, for the VPS's own alerts to the `alerts` topic.
 { config, ... }:
 let
   port = 2586;
 in
 {
   sops.secrets.ntfy-env = { };
+  sops.secrets.ntfy-alert-token = { };
 
   services.ntfy-sh = {
     enable = true;

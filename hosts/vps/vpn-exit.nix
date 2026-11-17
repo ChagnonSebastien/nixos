@@ -50,7 +50,7 @@ let
 
   vpn-exit = pkgs.writeShellApplication {
     name = "vpn-exit";
-    runtimeInputs = with pkgs; [ iproute2 wireguard-tools iputils gawk coreutils ];
+    runtimeInputs = with pkgs; [ iproute2 wireguard-tools iputils gawk coreutils curl systemd ];
     text = builtins.readFile ./vpn-exit.sh;
   };
   env = {
@@ -66,6 +66,8 @@ let
     TABLE = table;
     CLIENT_IF = "wg-exit";
     PROBE_TARGET = "1.1.1.1";
+    NTFY_URL = "http://127.0.0.1:2586/alerts";
+    NTFY_TOKEN_FILE = config.sops.secrets.ntfy-alert-token.path;
   };
 in
 {
