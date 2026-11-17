@@ -16,7 +16,6 @@ let
   r = net.roaming;
   wan = net.vps.wanInterface;
   table = "51822";
-  altPort = 4500;
   stateDir = "/var/lib/vpn-exit";
   apiStateDir = "/var/lib/vpn-exit-api";
   textfileDir = "/var/lib/prometheus-node-exporter-text";
@@ -95,11 +94,6 @@ in
   };
 
   networking.firewall.extraCommands = ''
-    # networks that throttle unknown UDP ports often spare 4500 (IPsec NAT-T)
-    iptables -t nat -N vpn-exit-pre 2>/dev/null || iptables -t nat -F vpn-exit-pre
-    iptables -t nat -A vpn-exit-pre -i ${wan} -p udp --dport ${toString altPort} -j REDIRECT --to-ports ${toString r.exitPort}
-    iptables -t nat -C PREROUTING -j vpn-exit-pre 2>/dev/null || iptables -t nat -A PREROUTING -j vpn-exit-pre
-
     iptables -t nat -N vpn-exit-post 2>/dev/null || iptables -t nat -F vpn-exit-post
     iptables -t nat -A vpn-exit-post -o wg-upstream -j MASQUERADE
     iptables -t nat -C POSTROUTING -j vpn-exit-post 2>/dev/null || iptables -t nat -A POSTROUTING -j vpn-exit-post
@@ -118,7 +112,6 @@ in
       iptables -t mangle -I PREROUTING -i wg-upstream -j RETURN
   '';
   networking.firewall.extraStopCommands = ''
-    iptables -t nat -D PREROUTING -j vpn-exit-pre 2>/dev/null || true
     iptables -t nat -D POSTROUTING -j vpn-exit-post 2>/dev/null || true
     iptables -D FORWARD -j vpn-exit-fwd 2>/dev/null || true
     iptables -t mangle -D PREROUTING -i wg-upstream -j RETURN 2>/dev/null || true
