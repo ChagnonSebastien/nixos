@@ -22,8 +22,6 @@ in
       listen-http = "127.0.0.1:${toString port}";
       behind-proxy = true;
       auth-default-access = "deny-all";
-      # iOS only gets pushes through ntfy.sh's APNs relay; it sees a hash of the message ID, not the content
-      upstream-base-url = "https://ntfy.sh";
     };
   };
 
