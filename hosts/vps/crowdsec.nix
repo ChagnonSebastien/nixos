@@ -45,11 +45,11 @@ in
         parsers.s02Enrich = [
           {
             name = "sebsuite/whitelist-infra";
-            description = "Never flag the VPS itself (Gatus checks), localhost or the homelab tunnel";
+            description = "Never flag the VPS itself (Gatus checks), localhost, the homelab tunnel or roaming clients";
             whitelist = {
               reason = "own infrastructure";
               ip = [ net.vps.ipv4 net.vps.ipv6 "127.0.0.1" "::1" ];
-              cidr = [ net.wgVps.subnet ];
+              cidr = [ net.wgVps.subnet net.roaming.subnet ];
             };
           }
         ];

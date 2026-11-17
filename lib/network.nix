@@ -17,6 +17,7 @@
   # Phones and laptops: one WireGuard interface with two peers, the homelab via the VPS relay
   # (192.168.0.0/24) and the VPS exit (everything else), so each client keeps one IP on both.
   roaming = {
+    subnet = "10.7.0.0/24";
     homelabIp = "10.7.0.1";
     prefixLength = 24;
     exitPort = 51822;
