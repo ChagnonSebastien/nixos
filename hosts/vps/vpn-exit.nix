@@ -25,8 +25,18 @@ let
   # fallback when the API list is missing or stale; endpoint and public key are in any config
   # downloaded for that server
   staticServers = [
-    { name = "ca-1212"; endpoint = "84.20.16.29:51820"; publicKey = "uUM9J8bziO0yZfsdYoruEfP3m6YuSu+Mek9W/J8mT1Y="; }
-    { name = "ca-589"; endpoint = "104.254.95.98:51820"; publicKey = "SFesR+3u5/vyQGeaCSREjs4m2WznwFlWAQ9CE3QSnRg="; }
+    # Montreal, about 2 ms from the VPS
+    { name = "CA#97"; endpoint = "146.70.198.34:51820"; publicKey = "28hrybwV/NiiMXvl1ynBvDvEvs1m8ABUzyvkQ7+ST3I="; }
+    { name = "CA#162"; endpoint = "176.113.74.82:51820"; publicKey = "nLx6LJgXWOtnlKV65ruYMGjiw4DERImZGCpN3lolm1I="; }
+    { name = "CA#92"; endpoint = "146.70.198.50:51820"; publicKey = "b5Wy36VwywSceq7wfLAe/QxcQ/UQC11txwkGes/CEWc="; }
+    { name = "CA#132"; endpoint = "146.70.198.2:51820"; publicKey = "aQ2NoOYEObG9tDMwdc4VxK6hjW+eA0PLfgbH7ffmagU="; }
+    { name = "CA#114"; endpoint = "146.70.198.18:51820"; publicKey = "RWj/yInIFoGovnNO3wKBcMrdPmDjckc0TVNgOSSZsgs="; }
+    { name = "CA#219"; endpoint = "139.28.218.130:51820"; publicKey = "UR8vjVYrrWYadCwLKiAabKTIdxM4yikmCXnvKWm89D8="; }
+    { name = "CA#183"; endpoint = "139.28.218.2:51820"; publicKey = "szjIaWj1+sWfmmap7eqtkgHDPl/y8HLHt+eeNbl/0w0="; }
+    # Montreal, 9 ms
+    { name = "CA#1235"; endpoint = "84.20.16.29:51820"; publicKey = "uUM9J8bziO0yZfsdYoruEfP3m6YuSu+Mek9W/J8mT1Y="; }
+    # Toronto, 27 ms, in case Montreal is out
+    { name = "CA#1177"; endpoint = "185.111.110.69:51820"; publicKey = "X7pCaYl2CqoCI+MpI+5Sd2RwXNlVhDyTQ+iaAttC5Uw="; }
   ];
   staticServersFile = pkgs.writeText "vpn-exit-servers" (
     lib.concatMapStrings (s: "${s.name} ${s.endpoint} ${s.publicKey}\n") staticServers

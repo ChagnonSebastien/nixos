@@ -1,4 +1,4 @@
-"""Writes the provider's servers for one country, best score first, for vpn-exit.sh.
+"""Writes the provider's servers for one country, one line per machine, best score first, for vpn-exit.sh.
 
 Uses Proton's own Linux client libraries, identified as their CLI, so the traffic matches the
 official client. ProtonVPNAPI is never built: it is what turns on Proton's crash reporting.
@@ -65,14 +65,20 @@ async def login():
 def write_servers(session):
     tier = session.vpn_account.max_tier
     lines = []
+    seen = set()
     for server in sorted(session.server_list.logicals, key=lambda s: s.score):
         if server.exit_country.upper() != COUNTRY or not server.enabled or server.tier > tier:
+            continue
+        # free servers are the most crowded; a paid account has better ones
+        if tier > 0 and server.tier == 0:
             continue
         if any(f & EXCLUDED for f in server.features):
             continue
         physical = next((p for p in server.physical_servers if p.enabled and p.x25519_pk), None)
-        if physical is None:
+        # many logical servers share one machine; keep its best-scored name only
+        if physical is None or physical.x25519_pk in seen:
             continue
+        seen.add(physical.x25519_pk)
         name = server.name.replace(" ", "_")
         lines.append(f"{name} {physical.entry_ip}:{WG_PORT} {physical.x25519_pk} {server.score} {server.load}\n")
     if not lines:

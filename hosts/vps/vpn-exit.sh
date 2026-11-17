@@ -47,7 +47,8 @@ api_age() {
   echo $(($(date +%s) - mtime))
 }
 
-# the active server is always measured, even when it dropped out of the candidates
+# the active server is always measured, even when it dropped out of the candidates; servers are
+# matched by public key, since the provider's name for a machine changes between refreshes
 candidates() {
   local age active
   age=$(api_age)
@@ -62,7 +63,7 @@ candidates() {
     cat "$STATIC_SERVERS_FILE"
   fi > "$STATE_DIR/candidates"
   active=$(cat "$active_file" 2> /dev/null || true)
-  if [ -n "$active" ] && ! grep -q "^${active%% *} " "$STATE_DIR/candidates"; then
+  if [ -n "$active" ] && ! cut -d' ' -f3 "$STATE_DIR/candidates" | grep -qxF "${active##* }"; then
     echo "$active" >> "$STATE_DIR/candidates"
   fi
   cat "$STATE_DIR/candidates"
@@ -95,11 +96,12 @@ switch_to() {
 }
 
 select_server() {
-  local active best='' best_line='' best_rtt='' rtt active_ms='' name endpoint public_key
+  local active active_key best='' best_key='' best_line='' best_rtt='' rtt active_ms='' name endpoint public_key
   active=$(cut -d' ' -f1 "$active_file" 2> /dev/null || true)
+  active_key=$(cut -d' ' -f3 "$active_file" 2> /dev/null || true)
   while read -r name endpoint public_key; do
     [ -n "$name" ] || continue
-    if [ "$name" = "$active" ]; then
+    if [ -n "$active_key" ] && [ "$public_key" = "$active_key" ]; then
       rtt=$(active_rtt) || rtt=''
       active_ms=$rtt
     else
@@ -108,7 +110,7 @@ select_server() {
     echo "$name: ${rtt:-unreachable}${rtt:+ ms}"
     [ -n "$rtt" ] || continue
     if [ -z "$best" ] || awk -v a="$rtt" -v b="$best_rtt" 'BEGIN { exit !(a < b) }'; then
-      best=$name best_line="$name $endpoint $public_key" best_rtt=$rtt
+      best=$name best_key=$public_key best_line="$name $endpoint $public_key" best_rtt=$rtt
     fi
   done < <(candidates)
   date +%s > "$last_select_file"
@@ -117,7 +119,7 @@ select_server() {
     echo "no candidate server answered; client traffic is blackholed until one does" >&2
     return 1
   fi
-  if [ "$best" = "$active" ]; then
+  if [ "$best_key" = "$active_key" ]; then
     return 0
   fi
   if [ -n "$active_ms" ] && ! awk -v b="$best_rtt" -v a="$active_ms" -v g="$min_gain_ms" -v r="$min_gain_ratio" \
