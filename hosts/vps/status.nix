@@ -73,7 +73,6 @@ in
           url = "tcp://${net.wgVps.homelab.ip}:${toString net.homelab.caddyPort}";
           interval = "30s";
           conditions = [ "[CONNECTED] == true" ];
-          # the only alert: services fail with it during a tunnel outage, and Gatus cannot suppress them
           alerts = [ { type = "ntfy"; } ];
         }
       ] ++ map (s: {
@@ -81,6 +80,7 @@ in
         group = "Services";
         interval = "1m";
         conditions = s.conditions ++ [ "[RESPONSE_TIME] < 5000" ];
+        alerts = [ { type = "ntfy"; } ];
       }) services;
     };
   };
