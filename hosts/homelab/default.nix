@@ -185,6 +185,9 @@ in
   };
 
   services.openssh.enable = true;
+  # deployed from WSL as seb (--target-host), whose locally built paths are unsigned; seb has
+  # sudo here already, so this grants nothing new
+  nix.settings.trusted-users = [ "root" "seb" ];
 
   # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
   # and migrated your data accordingly.
