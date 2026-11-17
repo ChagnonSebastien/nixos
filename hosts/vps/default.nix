@@ -8,6 +8,7 @@ in
     ./edge.nix
     ./metrics.nix
     ./status.nix
+    ./ntfy.nix
     ./vpn-relay.nix
     ./vpn-exit.nix
     ./crowdsec.nix
