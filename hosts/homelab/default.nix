@@ -184,6 +184,7 @@ in
     linger = true;
     openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID5w4aOQVRSBeNk3Z0ei0POMMQBmHb6EAoDMswNluupK backup"
     ];
   };
 
