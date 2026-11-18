@@ -81,6 +81,9 @@ in
 
   networking.firewall.allowedUDPPorts = [ r.exitPort ];
 
+  # otherwise every networkd restart (any netdev change) deletes vpn-exit's ip rules
+  systemd.network.config.networkConfig.ManageForeignRoutingPolicyRules = false;
+
   networking.wireguard.interfaces.wg-exit = {
     ips = [ "10.7.0.254/32" ];
     listenPort = r.exitPort;
