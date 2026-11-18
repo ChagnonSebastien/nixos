@@ -7,6 +7,7 @@ in
   imports = [
     ./hardware.nix
     ./bulk-consolidate.nix
+    ./pi-hole
     ../../modules/user.nix
     ../../modules/kvm.nix
     ../../modules/boot-grub.nix
