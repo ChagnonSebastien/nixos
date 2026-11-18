@@ -1,37 +1,5 @@
 { pkgs, lib, ... }:
 let
-  wireguard = lib.getExe (pkgs.writeShellApplication {
-    name = "waybar-wireguard";
-    runtimeInputs = with pkgs; [ networkmanager procps ];
-    text = ''
-      active() {
-        nmcli -t -f NAME,TYPE connection show --active | awk -F: '$2 == "wireguard" && !found { print $1; found = 1 }'
-      }
-
-      case "''${1:-status}" in
-        status)
-          current=$(active)
-          echo " ''${current:-direct}"
-          ;;
-        next)
-          mapfile -t locations < <(nmcli -t -f NAME,TYPE connection show | awk -F: '$2 == "wireguard" { print $1 }' | sort)
-          locations+=(direct)
-          current=$(active)
-          current=''${current:-direct}
-          next=''${locations[0]}
-          for i in "''${!locations[@]}"; do
-            if [[ "''${locations[$i]}" == "$current" ]]; then
-              next=''${locations[$(( (i + 1) % ''${#locations[@]} ))]}
-            fi
-          done
-          if [[ "$current" != direct ]]; then nmcli connection down "$current" >/dev/null; fi
-          if [[ "$next" != direct ]]; then nmcli connection up "$next" >/dev/null; fi
-          pkill -RTMIN+8 waybar || true
-          ;;
-      esac
-    '';
-  });
-
   stats = lib.getExe (pkgs.writeShellApplication {
     name = "waybar-stats";
     text = ''
@@ -69,7 +37,7 @@ in {
         height = 24;
         modules-left = [ "hyprland/workspaces" "hyprland/submap" "mpris"];
         modules-center = [ "hyprland/window" ];
-        modules-right = [ "keyboard-state" "custom/stats" "network" "custom/network_toggle" "pulseaudio" "tray" "clock" "custom/notification" ];
+        modules-right = [ "keyboard-state" "custom/stats" "network" "pulseaudio" "tray" "clock" "custom/notification" ];
         
         "custom/stats" = {
           exec = stats;
@@ -99,12 +67,6 @@ in {
           escape = true;
         };
 
-        "custom/network_toggle" = {
-          exec = "${wireguard} status";
-          on-click = "${wireguard} next";
-          signal = 8;
-          interval = 60;
-        };
 
         "hyprland/workspaces" = {
           disable-scroll = true;

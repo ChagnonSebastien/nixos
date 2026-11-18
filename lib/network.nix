@@ -25,6 +25,10 @@
       { publicKey = "T4pPomAl7cPP/LVBcHvxjzSRqYJb/ZpPxnBlObZ710o="; ip = "10.7.0.2"; }
       { publicKey = "n90nNFBkbpqHjeHAKSIwZfEiahtkNLzykQwTvS/c8j8="; ip = "10.7.0.3"; }
     ];
+    # exit only: it sits on the LAN, so the homelab's wg-home does not list it
+    desktop = { publicKey = "SmyDPfUbVeZXxmGFeuGnzLt62q6bOxUcacG4m53rZnU="; ip = "10.7.0.4"; };
+    # on the VPS: `sudo wg show wg-exit public-key`
+    exitPublicKey = "W8cBgfscXGESIqbEpk+1hnDL5LTCnYGi2gmUuJI9Bwo=";
   };
 
   # secret halves are /etc/nix/deploy-key.sec on each deploying machine, created by hand

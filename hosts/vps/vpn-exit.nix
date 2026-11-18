@@ -93,7 +93,7 @@ in
     peers = map (c: {
       inherit (c) publicKey;
       allowedIPs = [ "${c.ip}/32" ];
-    }) r.clients;
+    }) (r.clients ++ [ r.desktop ]);
   };
 
   networking.firewall.extraCommands = ''

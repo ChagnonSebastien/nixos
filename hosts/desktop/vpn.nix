@@ -1,90 +1,59 @@
-{ lib, ... }:
+{ ... }:
 let
   net = import ../../lib/network.nix;
-  envFile = "/var/lib/nm-vpn/wireguard.env";
-
-  wireguard =
-    {
-      id,
-      keyVar,
-      publicKey,
-      endpoint,
-      dns,
-      dnsPriority ? 0,
-      autoconnect ? false,
-    }:
-    {
-      connection = {
-        inherit id;
-        type = "wireguard";
-        interface-name = id;
-        autoconnect = lib.boolToString autoconnect;
-      };
-      wireguard.private-key = "$" + keyVar;
-      "wireguard-peer.${publicKey}" = {
-        inherit endpoint;
-        allowed-ips = "0.0.0.0/0;::/0;";
-        persistent-keepalive = 25;
-      };
-      ipv4 = {
-        method = "manual";
-        address1 = "10.2.0.2/32";
-        inherit dns;
-        dns-priority = dnsPriority;
-        dns-search = "~;";
-        ignore-auto-dns = "true";
-      };
-      ipv6.method = "disabled";
-    };
-
-  profiles = {
-    canada = wireguard {
-      id = "canada";
-      keyVar = "CANADA_WG_KEY";
-      publicKey = "szjIaWj1+sWfmmap7eqtkgHDPl/y8HLHt+eeNbl/0w0=";
-      endpoint = "139.28.218.2:51820";
-      dns = "1.1.1.1;9.9.9.9;";
-      dnsPriority = -42;
-      autoconnect = true;
-    };
-    iceland = wireguard {
-      id = "iceland";
-      keyVar = "ICELAND_WG_KEY";
-      publicKey = "yKbYe2XwbeNN9CuPZcwMF/lJp6a62NEGiHCCfpfxrnE=";
-      endpoint = "185.159.158.1:51820";
-      dns = "${net.homelab.lanIp};10.2.0.1;";
-    };
-    usa = wireguard {
-      id = "usa";
-      keyVar = "USA_WG_KEY";
-      publicKey = "XeVyTJgexTGQ6w9xmiosAH6w86n8d7QKs3NBzU0Ze3k=";
-      endpoint = "149.88.21.1:51820";
-      dns = "${net.homelab.lanIp};10.2.0.1;";
-    };
-  };
+  r = net.roaming;
+  wan = "enp0s31f6";
+  ifname = "vps-exit";
+  lanSubnets = [ "192.168.0.0/24" "192.168.1.0/24" ];
 in
 {
-  # Profiles live in /run: `nmcli con modify` forks a persistent duplicate, change them here.
-  networking.networkmanager.ensureProfiles = {
-    environmentFiles = [ envFile ];
-    profiles = profiles // {
-      wired = {
-        connection = {
-          id = "wired";
-          type = "ethernet";
-          interface-name = "enp0s31f6";
-        };
-        ipv4 = {
-          method = "auto";
-          # 192.168.0.2 serves DNS to iceland/usa and must stay out of the full tunnels.
-          route1 = "192.168.0.0/24,192.168.1.1";
-        };
-        ipv6.method = "auto";
-      };
-    };
+  networking.wg-quick.interfaces.${ifname} = {
+    address = [ "${r.desktop.ip}/32" ];
+    mtu = 1420;
+    # installed by hand; a generated key would not match the peer the VPS pins
+    privateKeyFile = "/var/lib/wireguard/${ifname}.key";
+    peers = [
+      {
+        publicKey = r.exitPublicKey;
+        endpoint = "${net.vps.ipv4}:${toString r.exitPort}";
+        allowedIPs = [ "0.0.0.0/0" ];
+        persistentKeepalive = 25;
+      }
+    ];
   };
 
-  systemd.services.NetworkManager-ensure-profiles.preStart = lib.concatMapStrings (p: ''
-    : "''${${lib.removePrefix "$" p.wireguard.private-key}:?missing from ${envFile}}"
-  '') (lib.attrValues profiles);
+  # Profiles live in /run: `nmcli con modify` forks a persistent duplicate, change them here.
+  networking.networkmanager.ensureProfiles.profiles.wired = {
+    connection = {
+      id = "wired";
+      type = "ethernet";
+      interface-name = wan;
+    };
+    ipv4 = {
+      method = "auto";
+      # 192.168.0.2 (homelab) sits behind the router; the main-table /24 wins over the tunnel
+      route1 = "192.168.0.0/24,192.168.1.1";
+      dns = "${net.homelab.lanIp};";
+      ignore-auto-dns = "true";
+    };
+    # the exit is IPv4 only
+    ipv6.method = "disabled";
+  };
+
+  # Kill switch: off the LAN, only the tunnel's own UDP may leave the wire.
+  networking.firewall.extraCommands = ''
+    iptables -N vpn-killswitch 2>/dev/null || iptables -F vpn-killswitch
+    ${builtins.concatStringsSep "\n" (map (s: "iptables -A vpn-killswitch -d ${s} -j RETURN") lanSubnets)}
+    iptables -A vpn-killswitch -d 224.0.0.0/4 -j RETURN
+    iptables -A vpn-killswitch -d 255.255.255.255 -j RETURN
+    iptables -A vpn-killswitch -d ${net.vps.ipv4} -p udp --dport ${toString r.exitPort} -j RETURN
+    iptables -A vpn-killswitch -j REJECT --reject-with icmp-net-unreachable
+    iptables -C OUTPUT -o ${wan} -j vpn-killswitch 2>/dev/null || iptables -I OUTPUT -o ${wan} -j vpn-killswitch
+
+    ip6tables -C OUTPUT -o ${wan} -j REJECT 2>/dev/null || ip6tables -I OUTPUT -o ${wan} -j REJECT
+  '';
+  networking.firewall.extraStopCommands = ''
+    iptables -D OUTPUT -o ${wan} -j vpn-killswitch 2>/dev/null || true
+    ip6tables -D OUTPUT -o ${wan} -j REJECT 2>/dev/null || true
+  '';
 }
