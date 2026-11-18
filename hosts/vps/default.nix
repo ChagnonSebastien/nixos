@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
   net = import ../../lib/network.nix;
 in
@@ -37,16 +37,22 @@ in
       PermitRootLogin = "prohibit-password";
     };
   };
+  sops.secrets.seb-password.neededForUsers = true;
+  # passwords come only from sops (root stays locked): `passwd` changes are reverted on the next activation
+  users.mutableUsers = false;
   users.users.seb = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
+    hashedPasswordFile = config.sops.secrets.seb-password.path;
     openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID5w4aOQVRSBeNk3Z0ei0POMMQBmHb6EAoDMswNluupK backup"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID5w4aOQVRSBeNk3Z0ei0POMMQBmHb6EAoDMswNluupK backup"
     ];
   };
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIb8DukSl7cKWd80kIYsMal4GGA9i/RVP/7PHp5Ko+i0 seb@vps"
+    # temporary: remove once seb's sops password is proven to work for sudo
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL"
   ];
 
   boot.loader.grub.configurationLimit = 10;

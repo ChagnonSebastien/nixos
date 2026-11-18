@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   net = import ../../lib/network.nix;
   wgv = net.wgVps;
@@ -179,16 +179,37 @@ in
   # nixpkgs only sets Requires=, so GPU containers race the CDI spec and die
   systemd.services.docker.after = [ "nvidia-container-toolkit-cdi-generator.service" ];
 
+  sops.secrets = {
+    seb-password.neededForUsers = true;
+    root-password.neededForUsers = true;
+  };
+  # passwords come only from sops: `passwd` changes are reverted on the next activation
+  users.mutableUsers = false;
   users.users.seb = {
     extraGroups = [ "docker" ];
     linger = true;
+    initialPassword = lib.mkForce null;
+    hashedPasswordFile = config.sops.secrets.seb-password.path;
     openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID5w4aOQVRSBeNk3Z0ei0POMMQBmHb6EAoDMswNluupK backup"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID5w4aOQVRSBeNk3Z0ei0POMMQBmHb6EAoDMswNluupK backup"
     ];
   };
+  # root's password is for the emergency shell (sulogin) only; SSH never accepts it
+  users.users.root = {
+    hashedPasswordFile = config.sops.secrets.root-password.path;
+    # temporary: remove once seb's sops password is proven to work for sudo
+    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL" ];
+  };
 
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "prohibit-password";
+    };
+  };
   # deployed from WSL as seb (--target-host), whose locally built paths are unsigned; seb has
   # sudo here already, so this grants nothing new
   nix.settings.trusted-users = [ "root" "seb" ];

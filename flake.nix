@@ -116,7 +116,13 @@
       nixosConfigurations = builtins.mapAttrs mkHost {
         desktop.channel  = unstable;
         laptop.channel   = unstable;
-        homelab.channel  = stable;
+        homelab = {
+          channel      = stable;
+          extraModules = [
+            sops-nix.nixosModules.sops
+            { sops.defaultSopsFile = "${secrets}/homelab.yaml"; }
+          ];
+        };
         wsl = {
           channel      = stable;
           extraModules = [ nixos-wsl.nixosModules.default ];
