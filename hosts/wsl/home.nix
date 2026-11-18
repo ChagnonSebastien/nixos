@@ -22,6 +22,11 @@ in
 
   programs.git.settings.user.email = "sebastien.chagnon@qohash.com";
 
+  services.ssh-agent = {
+    enable = true;
+    defaultMaximumIdentityLifetime = 14400;
+  };
+
   # The state version is required and should stay at the version you
   # originally installed.
   home.stateVersion = "24.05";
