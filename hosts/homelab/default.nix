@@ -197,18 +197,14 @@ in
     ];
   };
   # root's password is for the emergency shell (sulogin) only; SSH never accepts it
-  users.users.root = {
-    hashedPasswordFile = config.sops.secrets.root-password.path;
-    # temporary: remove once seb's sops password is proven to work for sudo
-    openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@desktop" ];
-  };
+  users.users.root.hashedPasswordFile = config.sops.secrets.root-password.path;
 
   services.openssh = {
     enable = true;
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      PermitRootLogin = "prohibit-password";
+      PermitRootLogin = "no";
     };
   };
   # deployed from WSL as seb (--target-host), whose locally built paths are unsigned; seb has
