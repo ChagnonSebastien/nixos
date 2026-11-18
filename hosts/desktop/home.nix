@@ -2,6 +2,7 @@
 
   imports = [
     ../../home/modules/desktop-apps.nix
+    ../../home/modules/ssh.nix
     ../../home/desktop-environment/hyprland.nix
   ];
 

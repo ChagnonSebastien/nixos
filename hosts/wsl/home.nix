@@ -6,6 +6,7 @@ in
 
   imports = [
     ../../home/modules/devtools.nix
+    ../../home/modules/ssh.nix
   ];
 
   home.sessionVariables = {
