@@ -182,6 +182,9 @@ in
   users.users.seb = {
     extraGroups = [ "docker" ];
     linger = true;
+    openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@DesktopL"
+    ];
   };
 
   services.openssh.enable = true;
