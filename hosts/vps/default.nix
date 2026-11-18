@@ -34,7 +34,7 @@ in
       # still works for sudo and the OVH console
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
-      PermitRootLogin = "prohibit-password";
+      PermitRootLogin = "no";
     };
   };
   sops.secrets = {
@@ -55,11 +55,8 @@ in
   };
   # root's password is for the emergency shell (sulogin) only; SSH never accepts it
   users.users.root.hashedPasswordFile = config.sops.secrets.root-password.path;
-  users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIb8DukSl7cKWd80kIYsMal4GGA9i/RVP/7PHp5Ko+i0 seb@wsl"
-    # temporary: remove once seb's sops password is proven to work for sudo
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC/ue3htKr0j2gAjPxg38E8UB/NYegnR3rr3R9Zhj7MP seb@desktop"
-  ];
+  # deployed as seb: closures must carry a deploy signature, since trusting seb would be passwordless root
+  nix.settings.extra-trusted-public-keys = net.deployKeys;
 
   boot.loader.grub.configurationLimit = 10;
   environment.systemPackages = with pkgs; [ git vim ];

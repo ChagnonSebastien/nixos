@@ -27,6 +27,12 @@
     ];
   };
 
+  # secret halves are /etc/nix/deploy-key.sec on each deploying machine, created by hand
+  deployKeys = [
+    "desktop-deploy-1:pjOZ/WDfFVS72lciAE6z/gVDkC1dCXfUwTNfolW9uDg="
+    "wsl-deploy-1:+k4b0bQ76D7YfrIqzrlL9IJNUCawgvGZfhNErRNA3D8="
+  ];
+
   vps = {
     ipv4 = "198.245.55.120";
     ipv6 = "2607:5300:205:200::fccc";

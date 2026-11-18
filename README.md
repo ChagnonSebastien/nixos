@@ -26,12 +26,17 @@ On a fresh install, or to build another host, name it explicitly:
 sudo nixos-rebuild switch --flake .#<host>
 ```
 
-`vps` and `homelab` read secrets from the private `nixos-secrets` input, which only this
-machine can fetch, so deploy them from here instead of on the host:
+`vps` and `homelab` read secrets from the private `nixos-secrets` input, which only `desktop`
+and `wsl` can fetch, so deploy them from one of those instead of on the host. Deploys log in as
+seb, so the servers only accept closures signed with a key from `deployKeys` in
+`lib/network.nix`; a new deploying machine needs
+`sudo sh -c 'umask 077; nix key generate-secret --key-name <host>-deploy-1 > /etc/nix/deploy-key.sec'`,
+`nix.settings.secret-key-files` pointing at it, and its public half
+(`sudo cat /etc/nix/deploy-key.sec | nix key convert-secret-to-public`) in `deployKeys`:
 
 ```sh
-nixos-rebuild switch --flake .#vps --target-host root@198.245.55.120
-nixos-rebuild switch --flake .#homelab --target-host seb@192.168.0.2 --ask-sudo-password
+nixos-rebuild switch --flake .#vps --target-host vps --ask-sudo-password
+nixos-rebuild switch --flake .#homelab --target-host homelab --ask-sudo-password
 ```
 
 Update inputs with `nix flake update`; after committing to `nixos-secrets`, `nix flake update secrets`.

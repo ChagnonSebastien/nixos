@@ -13,6 +13,8 @@
     ../../modules/desktop-environment/hyprland.nix
   ];
 
+  nix.settings.secret-key-files = [ "/etc/nix/deploy-key.sec" ];
+
   networking = {
     networkmanager.enable = true;
     firewall = {

@@ -4,6 +4,8 @@
     ../../modules/devtools.nix
   ];
 
+  nix.settings.secret-key-files = [ "/etc/nix/deploy-key.sec" ];
+
   wsl.enable = true;
   wsl.defaultUser = "seb";
   # the aarch64 binfmt registration below otherwise breaks running .exe files
