@@ -30,6 +30,7 @@ events.launchdarkly.com
 # Blocked upstream by hagezi ultimate.txt as ||graph.facebook.com^
 graph.facebook.com
 b-graph.facebook.com
+web.facebook.com
 
 # Firebase Remote Config; La Presse won't open articles without it
 firebaseremoteconfig.googleapis.com
