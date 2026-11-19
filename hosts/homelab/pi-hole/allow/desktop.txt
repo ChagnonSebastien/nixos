@@ -21,3 +21,7 @@ lh3.googleusercontent.com
 
 # YouTube thumbnails
 i.ytimg.com
+
+# Youtube history
+s.youtube.com
+

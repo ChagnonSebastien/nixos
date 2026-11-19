@@ -20,6 +20,9 @@ alt8-mtalk.google.com
 i.ytimg.com
 youtubei.googleapis.com
 
+# Youtube history
+s.youtube.com
+
 # LaunchDarkly feature flags; Wealthsimple hides the Rewards Offers tab without it
 events.launchdarkly.com
 
