@@ -29,6 +29,7 @@ events.launchdarkly.com
 # Meta Graph API; Messenger cannot submit forms without it.
 # Blocked upstream by hagezi ultimate.txt as ||graph.facebook.com^
 graph.facebook.com
+b-graph.facebook.com
 
 # Firebase Remote Config; La Presse won't open articles without it
 firebaseremoteconfig.googleapis.com
