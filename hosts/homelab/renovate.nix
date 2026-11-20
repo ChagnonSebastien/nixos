@@ -1,5 +1,10 @@
 { config, pkgs, ... }:
 let
+  # git 2.54 drops a token-only URL credential after its first 200 and fails on private repos
+  gitconfig = pkgs.writeText "renovate-gitconfig" ''
+    [credential "https://github.com"]
+    	helper = "!f() { echo username=x-access-token; echo \"password=$(cat /run/credentials/renovate.service/SECRET-RENOVATE_TOKEN)\"; }; f"
+  '';
   report = "/var/lib/renovate/report.json";
   textfile = "/home/seb/services/docker/observability/textfile";
 in
@@ -19,6 +24,7 @@ in
       ];
       onboarding = false;
       gitAuthor = "Renovate <renovate@chagnon.dev>";
+      customEnvVariables.GIT_CONFIG_SYSTEM = "${gitconfig}";
       reportType = "file";
       reportPath = report;
     };
