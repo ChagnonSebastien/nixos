@@ -17,7 +17,10 @@
       "matchManagers": [
         "nix"
       ],
-      "dependencyDashboardApproval": true
+      "dependencyDashboardApproval": true,
+      "prBodyNotes": [
+        "Before merging a NixOS release bump: sops-nix `restartUnits` relies on `/run/nixos/activation-restart-list`, deprecated for removal. Check that `pkgs/by-name/sw/switch-to-configuration-ng/src/main.rs` on the new release branch still reads `RESTART_BY_ACTIVATION_LIST_FILE`. If it does not, secret changes stop restarting containers: set `sops.useSystemdActivation = true` once Mic92/sops-nix#1009 is merged, otherwise `restartTriggers = [ sopsFileHash ]` on the containers that use secrets."
+      ]
     }
   ]
 }
