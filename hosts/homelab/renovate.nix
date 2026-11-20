@@ -36,14 +36,34 @@ in
   systemd.services.renovate.preStart = "ln -sf ${gitconfig} /var/lib/renovate/.gitconfig";
 
   systemd.timers.renovate.timerConfig.Persistent = true;
-  systemd.services.renovate.onSuccess = [ "renovate-metrics.service" ];
+  systemd.services.renovate.onSuccess = [ "renovate-report.service" ];
 
-  systemd.services.renovate-metrics = {
-    serviceConfig.Type = "oneshot";
-    path = [ pkgs.jq ];
+  # reuse the ntfy token labelled homelab in the VPS ntfy-env
+  sops.secrets.ntfy-token = { };
+
+  systemd.services.renovate-report = {
+    serviceConfig = {
+      Type = "oneshot";
+      StateDirectory = "renovate-report";
+      LoadCredential = "ntfy:${config.sops.secrets.ntfy-token.path}";
+    };
+    path = [ pkgs.jq pkgs.curl ];
     script = ''
       jq -r --arg now "$(date +%s)" -f ${./metrics/renovate.jq} ${report} > ${textfile}/renovate.prom.tmp
       mv ${textfile}/renovate.prom.tmp ${textfile}/renovate.prom
+
+      seen=$STATE_DIRECTORY/seen-prs
+      touch "$seen"
+      jq -r '.repositories | to_entries[] | .key as $r | .value.branches[] | select(.prNo != null)
+        | [$r, (.prNo|tostring), (.prTitle // .branchName)] | @tsv' ${report} |
+      while IFS=$(printf '\t') read -r repo pr title; do
+        grep -qxF "$repo#$pr" "$seen" && continue
+        curl -fsS -o /dev/null -H "Authorization: Bearer $(cat "$CREDENTIALS_DIRECTORY/ntfy")" \
+          -H "Title: Renovate PR on $repo" -H "Tags: package" \
+          -H "Click: https://github.com/$repo/pull/$pr" \
+          -d "$title" https://ntfy.chagnon.dev/updates \
+          && echo "$repo#$pr" >> "$seen"
+      done
     '';
   };
 }
