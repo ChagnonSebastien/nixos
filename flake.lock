@@ -252,11 +252,11 @@
     "services": {
       "flake": false,
       "locked": {
-        "lastModified": 1795134981,
-        "narHash": "sha256-6iUJC7G878tTZOMtblJWzTZD5QlT5brY9hGQOLqw3rc=",
+        "lastModified": 1795139233,
+        "narHash": "sha256-MkOLv+5aarfrxG/G6vGhRGq6Kw1WKUTxsKpm7o0hOM4=",
         "ref": "refs/heads/master",
-        "rev": "e31b60f69dd904669e696be4c748dc12e6c33ca9",
-        "revCount": 3,
+        "rev": "047dcdc429116bc4f3fbc5bda91a6b8b6dcccd12",
+        "revCount": 6,
         "type": "git",
         "url": "ssh://git@github.com/ChagnonSebastien/nixos-services.git"
       },
