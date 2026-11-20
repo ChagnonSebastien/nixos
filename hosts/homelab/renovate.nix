@@ -18,6 +18,7 @@ in
         "ChagnonSebastien/nixos-services"
       ];
       onboarding = false;
+      gitAuthor = "Renovate <renovate@chagnon.dev>";
       reportType = "file";
       reportPath = report;
     };
