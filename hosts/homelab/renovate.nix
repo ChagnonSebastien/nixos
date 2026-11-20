@@ -24,7 +24,6 @@ in
       ];
       onboarding = false;
       gitAuthor = "Renovate <renovate@chagnon.dev>";
-      customEnvVariables.GIT_CONFIG_SYSTEM = "${gitconfig}";
       reportType = "file";
       reportPath = report;
     };
@@ -32,6 +31,9 @@ in
 
   # flake.lock updates in nixos run nix inside the renovate sandbox
   services.renovate.runtimePackages = [ pkgs.nix ];
+
+  # simple-git rejects GIT_CONFIG_* env, so git must find the helper in HOME
+  systemd.services.renovate.preStart = "ln -sf ${gitconfig} /var/lib/renovate/.gitconfig";
 
   systemd.timers.renovate.timerConfig.Persistent = true;
   systemd.services.renovate.onSuccess = [ "renovate-metrics.service" ];
