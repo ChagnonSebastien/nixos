@@ -9,6 +9,7 @@ in
     ./bulk-consolidate.nix
     ./renovate.nix
     ./trivy.nix
+    ./nixpkgs-age.nix
     ./pi-hole
     ../../modules/user.nix
     ../../modules/kvm.nix

@@ -4,7 +4,7 @@ let
   textfile = "/home/seb/services/docker/observability/textfile";
 in
 {
-  # fine-grained PAT on nixos-services only: contents, pull requests, issues read/write
+  # fine-grained PAT on nixos and nixos-services: contents, pull requests, issues read/write
   sops.secrets.renovate-token = { };
 
   services.renovate = {
@@ -13,12 +13,18 @@ in
     credentials.RENOVATE_TOKEN = config.sops.secrets.renovate-token.path;
     settings = {
       platform = "github";
-      repositories = [ "ChagnonSebastien/nixos-services" ];
+      repositories = [
+        "ChagnonSebastien/nixos"
+        "ChagnonSebastien/nixos-services"
+      ];
       onboarding = false;
       reportType = "file";
       reportPath = report;
     };
   };
+
+  # flake.lock updates in nixos run nix inside the renovate sandbox
+  services.renovate.runtimePackages = [ pkgs.nix ];
 
   systemd.timers.renovate.timerConfig.Persistent = true;
   systemd.services.renovate.onSuccess = [ "renovate-metrics.service" ];
