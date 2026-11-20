@@ -163,6 +163,8 @@ in
     };
   };
 
+  virtualisation.oci-containers.backend = "docker";
+
   systemd.services.docker.unitConfig.RequiresMountsFor = [ "/media/bulk-toshiba" "/media/bulk-seagate" "/media/bulk" "/media/important" ];
 
   services.btrfs.autoScrub = {

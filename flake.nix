@@ -37,9 +37,13 @@
       url = "git+ssh://git@github.com/ChagnonSebastien/nixos-secrets.git";
       flake = false;
     };
+    services = {
+      url = "git+ssh://git@github.com/ChagnonSebastien/nixos-services.git";
+      flake = false;
+    };
   };
 
-  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, disko, sops-nix, secrets, ... }:
+  outputs = { nixpkgs, nixpkgs-unstable, nixos-wsl, home-manager, home-manager-unstable, nixvim, nixvim-unstable, disko, sops-nix, secrets, services, ... }:
     let
       system = "x86_64-linux";
 
@@ -121,6 +125,7 @@
           extraModules = [
             sops-nix.nixosModules.sops
             { sops.defaultSopsFile = "${secrets}/homelab.yaml"; }
+            "${services}/homelab"
           ];
         };
         wsl = {

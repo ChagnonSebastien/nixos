@@ -229,6 +229,7 @@
         "nixvim": "nixvim",
         "nixvim-unstable": "nixvim-unstable",
         "secrets": "secrets",
+        "services": "services",
         "sops-nix": "sops-nix"
       }
     },
@@ -246,6 +247,22 @@
       "original": {
         "type": "git",
         "url": "ssh://git@github.com/ChagnonSebastien/nixos-secrets.git"
+      }
+    },
+    "services": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1795131273,
+        "narHash": "sha256-tQwZfRxbIW+gutSumf4wwOcu62ilfbwTOb1Jx8435UM=",
+        "ref": "refs/heads/master",
+        "rev": "adc0c3a0f0a331b745ae48af198ca90bc3a45be6",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@github.com/ChagnonSebastien/nixos-services.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/ChagnonSebastien/nixos-services.git"
       }
     },
     "sops-nix": {
