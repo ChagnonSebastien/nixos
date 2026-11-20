@@ -7,6 +7,8 @@ in
   imports = [
     ./hardware.nix
     ./bulk-consolidate.nix
+    ./renovate.nix
+    ./trivy.nix
     ./pi-hole
     ../../modules/user.nix
     ../../modules/kvm.nix
