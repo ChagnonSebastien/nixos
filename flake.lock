@@ -236,11 +236,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1795144376,
-        "narHash": "sha256-LK4lIxyM0tbeeE1eGChUZL/UxIInARVI9igV8UOZ/qg=",
+        "lastModified": 1795146687,
+        "narHash": "sha256-JNUWfyli9fxAbDPnk6QjjbhRuA5zKicthtfIaC7M0zk=",
         "ref": "refs/heads/main",
-        "rev": "1c33bb418619a520ee524a4a76e675668a99d998",
-        "revCount": 11,
+        "rev": "1b6b08da0d37e13d97a087702a7f39d1f7cd6821",
+        "revCount": 12,
         "type": "git",
         "url": "ssh://git@github.com/ChagnonSebastien/nixos-secrets.git"
       },
@@ -252,11 +252,11 @@
     "services": {
       "flake": false,
       "locked": {
-        "lastModified": 1795144234,
-        "narHash": "sha256-qBI0Y7+peSiOcOvL3tnvt3tkahVcKC4ZYx6i3BGGZ7s=",
+        "lastModified": 1795146386,
+        "narHash": "sha256-SgpopwlIUOXiTMuTAcXoRufPCwco4yytxPbTSBiuRRg=",
         "ref": "refs/heads/master",
-        "rev": "90cfd774343f94d11c9d40b713ae7a224fc3b66f",
-        "revCount": 8,
+        "rev": "37fac76b1b5f48c31da330395b20deac63dba0b3",
+        "revCount": 11,
         "type": "git",
         "url": "ssh://git@github.com/ChagnonSebastien/nixos-services.git"
       },
