@@ -25,7 +25,6 @@
       "$HOME/go/bin"
     ];
     sessionVariables = {
-      SUDO_EDITOR = "nvim";
       SHELL = "${pkgs.zsh}/bin/zsh";
       PYTHONWARNINGS = "ignore::FutureWarning";
       DOTNET_SYSTEM_GLOBALIZATION_INVARIANT = "1";

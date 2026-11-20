@@ -3,6 +3,7 @@
   # Neovim via nixvim: catppuccin, cmp + luasnip, LSPs, telescope.
   programs.nixvim = {
     enable = true;
+    defaultEditor = true;
     nixpkgs.useGlobalPackages = true;
 
     colorschemes.catppuccin.enable = true;
